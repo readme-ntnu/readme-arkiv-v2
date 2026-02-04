@@ -2,7 +2,7 @@ const HOME = "/";
 const EDITION = "/edition/:id.pdf";
 const SEARCH = "/search";
 const ADMIN = "/admin";
-const SIGN_IN = "/signin";
+const LOGIN = "/login";
 const PASSWORD_FORGET = "/pw-forget";
 const EDITION_LIST = ADMIN + "/editions";
 const ARTICLE_LIST = ADMIN + "/articles";
@@ -16,12 +16,12 @@ export const ROUTES = {
   EDITION,
   SEARCH,
   ADMIN,
-  SIGN_IN,
+  LOGIN,
   PASSWORD_FORGET,
   NEW_EDITION,
   NEW_ARTICLE,
   EDIT_ARTICLE,
   EDITION_LIST,
   ARTICLE_LIST,
-  SETTINGS
+  SETTINGS,
 };

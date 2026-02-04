@@ -14,7 +14,7 @@ export const WithAuthentication = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace(ROUTES.SIGN_IN);
+      router.replace(ROUTES.LOGIN);
     }
   }, [user, loading, router]);
 
