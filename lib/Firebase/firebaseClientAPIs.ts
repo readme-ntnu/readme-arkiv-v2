@@ -70,12 +70,21 @@ export const deleteEdition = async (editionString: string) => {
   const pdfRef = ref(storage, pdfPath);
   const thumbRef = ref(storage, thumbPath);
 
-  await deleteObject(thumbRef).catch((err) =>
-    console.log("could not delete thumb: ", err)
-  );
-  await deleteObject(pdfRef).catch((err) =>
-    console.log("could not delete pdf: ", err)
-  );
+  const errors: Error[] = [];
+
+  await deleteObject(thumbRef).catch((err) => {
+    errors.push(err);
+  });
+
+  await deleteObject(pdfRef).catch((err) => {
+    errors.push(err);
+  });
+
+  if (errors.length > 0) {
+    throw new Error(
+      `Kunne ikke slette utgave:\n${errors.map((e) => e.message).join("\n")}`,
+    );
+  }
 };
 
 export const addNewArticle = async (

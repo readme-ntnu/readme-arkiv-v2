@@ -35,15 +35,27 @@ const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
   };
 
   const handleDeleteEdition = (edition: string) => {
-    deleteEdition(edition).then(() => {
-      addToast({
-        title: `Utgave ${edition} er slettet!`,
-        description:
-          "Merk at det kan ta 5-10 minutter før endringen er synlig på forsiden.",
-        color: "success",
+    deleteEdition(edition)
+      .then(() => {
+        addToast({
+          title: `Utgave ${edition} er slettet!`,
+          description:
+            "Merk at det kan ta 5-10 minutter før endringen er synlig på forsiden.",
+          color: "success",
+          timeout: 10000,
+        });
+        router.refresh();
+      })
+      .catch((error) => {
+        addToast({
+          title: `Kunne ikke slette utgave ${edition}!`,
+          description:
+            "Kun redaktør, nestleder og webansvarlig har tilgang til å slette utgaver. Ta kontakt med webansvarlig dersom du mener noe er feil.",
+          color: "danger",
+          timeout: 15000,
+        });
+        console.log(error);
       });
-      router.refresh();
-    });
   };
 
   return (
