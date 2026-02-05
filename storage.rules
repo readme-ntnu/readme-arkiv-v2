@@ -3,7 +3,16 @@ service firebase.storage {
   match /b/{bucket}/o {
     match /{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.token.firebase.sign_in_provider != "anonymous";
+      allow create: if request.auth != null 
+                   && request.auth.token.firebase.sign_in_provider != "anonymous"
+                   && request.auth.token.readmeMember == true;
+      allow update: if request.auth != null 
+                   && request.auth.token.firebase.sign_in_provider != "anonymous"
+                   && request.auth.token.readmeMember == true;
+      allow delete: if request.auth != null 
+                   && request.auth.token.firebase.sign_in_provider != "anonymous"
+                   && request.auth.token.readmeMember == true
+                   && (request.auth.token.readmeRole == "leader" || request.auth.token.readmeRole == "co_leader" || request.auth.token.readmeRole == "webmaster");
     }
   }
 }
