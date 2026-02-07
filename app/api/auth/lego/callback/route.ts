@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "lib/Firebase/firebaseAdmin";
 import { API_ROUTES, ROUTES } from "utils/routes";
+import getBaseUrl from "utils/baseUrl";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -20,8 +21,7 @@ export async function GET(request: Request) {
         grant_type: "authorization_code",
         client_id: process.env.LEGO_OAUTH_CLIENT_ID!,
         client_secret: process.env.LEGO_OAUTH_CLIENT_SECRET!,
-        redirect_uri:
-          process.env.NEXT_PUBLIC_BASE_URL + API_ROUTES.LEGO_CALLBACK,
+        redirect_uri: getBaseUrl() + API_ROUTES.LEGO_CALLBACK,
         code,
       }),
     },
@@ -63,7 +63,7 @@ export async function GET(request: Request) {
 
   if (!readmeMembership) {
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_BASE_URL}${ROUTES.LOGIN_ERROR}?message=${encodeURIComponent("Man må være medlem av readme for å få tilgang")}`,
+      `${getBaseUrl()}${ROUTES.LOGIN_ERROR}?message=${encodeURIComponent("Man må være medlem av readme for å få tilgang")}`,
     );
   }
 
@@ -78,6 +78,6 @@ export async function GET(request: Request) {
 
   // 4. Redirect back to app
   return NextResponse.redirect(
-    `${process.env.NEXT_PUBLIC_BASE_URL}${ROUTES.LOGIN_COMPLETE}?token=${firebaseToken}`,
+    `${getBaseUrl()}${ROUTES.LOGIN_COMPLETE}?token=${firebaseToken}`,
   );
 }

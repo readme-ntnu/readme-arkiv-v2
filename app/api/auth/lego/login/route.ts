@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import getBaseUrl from "utils/baseUrl";
 import { API_ROUTES } from "utils/routes";
 
 export async function GET() {
   const params = new URLSearchParams({
     response_type: "code",
     client_id: process.env.LEGO_OAUTH_CLIENT_ID!,
-    redirect_uri: process.env.NEXT_PUBLIC_BASE_URL + API_ROUTES.LEGO_CALLBACK,
+    redirect_uri: getBaseUrl() + API_ROUTES.LEGO_CALLBACK,
     scope: "user",
     approval_prompt: "auto",
   });
