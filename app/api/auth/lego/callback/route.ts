@@ -54,6 +54,7 @@ export async function GET(request: Request) {
   }
 
   const legoUser = await userRes.json();
+  console.log(legoUser);
 
   // 3. Create Firebase custom token
 
@@ -75,6 +76,8 @@ export async function GET(request: Request) {
     readmeMember: !!readmeMembership,
     readmeRole: readmeMembership && readmeMembership.role,
   });
+
+  console.log(readmeMembership.role);
 
   // 4. Redirect back to app
   return NextResponse.redirect(

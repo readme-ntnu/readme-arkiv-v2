@@ -12,7 +12,7 @@ service firebase.storage {
       allow delete: if request.auth != null 
                    && request.auth.token.firebase.sign_in_provider != "anonymous"
                    && request.auth.token.readmeMember == true
-                   && (request.auth.token.readmeRole == "leader" || request.auth.token.readmeRole == "co_leader" || request.auth.token.readmeRole == "webmaster");
+                   && (request.auth.token.readmeRole == "leader" || request.auth.token.readmeRole == "co_leader" || request.auth.token.readmeRole == "webmaster" || request.auth.token.readmeRole == "admin");
     }
   }
 }

@@ -1,1 +1,78 @@
-{"kind":"identitytoolkit#DownloadAccountResponse","users":[{"localId":"2EyubYl5TmWLmtuqfJFnAPV3rKmH","createdAt":"1625770075155","lastLoginAt":"1625770075155","validSince":"1629325431","emailVerified":false,"disabled":false},{"localId":"FRbhV3DCYABILl2mdQ1jnzihKPx2","createdAt":"1629325447609","lastLoginAt":"1629325447609","lastRefreshAt":"2021-08-18T22:24:07.611Z"},{"localId":"QFYAWgYhFdMh09qH3OzdDv4EWuYf","createdAt":"1629325798959","lastLoginAt":"1629325798959","lastRefreshAt":"2021-08-18T22:29:58.960Z"},{"localId":"RHG9EISMAymhqQhY0iWlis1BNMdq","createdAt":"1629325707932","lastLoginAt":"1629325707932","lastRefreshAt":"2021-08-18T22:28:27.934Z"},{"localId":"rCPKQ7CklRvUNlVbRpkUhsWtwrwG","createdAt":"1629325493110","lastLoginAt":"1629325493110","lastRefreshAt":"2021-08-18T22:24:53.111Z"},{"localId":"rQWgJ5S3IpTmG3kKGR1zornySffM","createdAt":"1625770110308","lastLoginAt":"1625770110307","displayName":"","photoUrl":"","passwordHash":"fakeHash:salt=fakeSaltWBRMwuj8RposKdmV2oKW:password=password","salt":"fakeSaltWBRMwuj8RposKdmV2oKW","passwordUpdatedAt":1629325431847,"providerUserInfo":[{"providerId":"password","email":"andreas.h.haaversen@gmail.com","federatedId":"andreas.h.haaversen@gmail.com","rawId":"andreas.h.haaversen@gmail.com","displayName":"","photoUrl":""}],"validSince":"1629325431","email":"andreas.h.haaversen@gmail.com","emailVerified":false,"disabled":false,"lastRefreshAt":"2021-08-18T22:29:42.701Z"},{"localId":"uSJ2uu3YxaqIVA4hxlN1WX2KjJah","createdAt":"1629323191156","lastLoginAt":"1629323191156","validSince":"1629325431","emailVerified":false,"disabled":false}]}
+{
+  "kind": "identitytoolkit#DownloadAccountResponse",
+  "users": [
+    {
+      "localId": "EmSVK37wSLW8unZUqjRWhajjkM21",
+      "lastLoginAt": "1785082255723",
+      "displayName": "Admin (user 1)",
+      "photoUrl": "",
+      "emailVerified": false,
+      "email": "user1@readme.no",
+      "salt": "fakeSaltCx0qCLSPi0cUWSU4FG7f",
+      "passwordHash": "fakeHash:salt=fakeSaltCx0qCLSPi0cUWSU4FG7f:password=password",
+      "passwordUpdatedAt": 1785082283589,
+      "validSince": "1785082283",
+      "createdAt": "1785082255723",
+      "providerUserInfo": [
+        {
+          "providerId": "password",
+          "email": "user1@readme.no",
+          "federatedId": "user1@readme.no",
+          "rawId": "user1@readme.no",
+          "displayName": "Admin (user 1)",
+          "photoUrl": ""
+        }
+      ],
+      "customAttributes": "{\"readmeMember\": true, \"readmeRole\": \"admin\"}"
+    },
+    {
+      "localId": "3sr0yrIriPbJ5X5mmNOcjWPVl2e9",
+      "lastLoginAt": "1785082277785",
+      "displayName": "readme member (user 2)",
+      "photoUrl": "",
+      "emailVerified": false,
+      "email": "user2@readme.no",
+      "salt": "fakeSaltyP2kpFe7mLnGfKDAFXmg",
+      "passwordHash": "fakeHash:salt=fakeSaltyP2kpFe7mLnGfKDAFXmg:password=password",
+      "passwordUpdatedAt": 1785082277785,
+      "validSince": "1785082277",
+      "mfaInfo": [],
+      "createdAt": "1785082277785",
+      "providerUserInfo": [
+        {
+          "providerId": "password",
+          "email": "user2@readme.no",
+          "federatedId": "user2@readme.no",
+          "rawId": "user2@readme.no",
+          "displayName": "readme member (user 2)",
+          "photoUrl": ""
+        }
+      ],
+      "customAttributes": "{\"readmeMember\": true}"
+    },
+    {
+      "localId": "loyNckuVElnrBOxCwVToOVp4M2Jp",
+      "lastLoginAt": "1785082318286",
+      "displayName": "Abakus member (user 3)",
+      "photoUrl": "",
+      "emailVerified": false,
+      "email": "user3@readme.no",
+      "salt": "fakeSaltAn0AowVwdHnnCMStWwwI",
+      "passwordHash": "fakeHash:salt=fakeSaltAn0AowVwdHnnCMStWwwI:password=password",
+      "passwordUpdatedAt": 1785082318286,
+      "validSince": "1785082318",
+      "mfaInfo": [],
+      "createdAt": "1785082318286",
+      "providerUserInfo": [
+        {
+          "providerId": "password",
+          "email": "user3@readme.no",
+          "federatedId": "user3@readme.no",
+          "rawId": "user3@readme.no",
+          "displayName": "Abakus member (user 3)",
+          "photoUrl": ""
+        }
+      ]
+    }
+  ]
+}

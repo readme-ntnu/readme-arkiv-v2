@@ -10,7 +10,7 @@ export default function SignInWithLego() {
     <Button
       radius="full"
       size="lg"
-      className="w-60"
+      className="w-full"
       startContent={
         <Image src={abakule} alt="Abakule" width={24} height={24} />
       }
