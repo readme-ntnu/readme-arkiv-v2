@@ -3,6 +3,7 @@ const EDITION = "/edition/:id.pdf";
 const SEARCH = "/search";
 const ADMIN = "/admin";
 const LOGIN = "/login";
+const LOGIN_WITH_PASSWORD = LOGIN + "/withpassword";
 const LOGIN_COMPLETE = LOGIN + "/complete";
 const LOGIN_ERROR = LOGIN + "/error";
 const PASSWORD_FORGET = "/pw-forget";
@@ -19,6 +20,7 @@ export const ROUTES = {
   SEARCH,
   ADMIN,
   LOGIN,
+  LOGIN_WITH_PASSWORD,
   LOGIN_COMPLETE,
   LOGIN_ERROR,
   PASSWORD_FORGET,

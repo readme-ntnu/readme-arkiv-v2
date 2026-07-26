@@ -45,9 +45,19 @@ yarn dev
 
 Du kan nå åpne nettsiden på [http://localhost:3000](http://localhost:3000).
 
-Det er satt opp Firebase-emulatorer for Functions, Firestore, Storage og Auth. Det er satt opp testdata til de tre siste. Emulatorene kan styres/justeres/inspiseres fra `localhost:4000`. Auth-emulatoren lastes inn med en testbruker som har e-post andreas.h.haaversen@gmail.com og passord `password`. Bruk denne om du vil se admin-sidene (`localhost:3000/admin`).
-
 NB! Dersom du gjør endringer i `functions/` underveis må du kompilere TypeScript filene på nytt for at Functions-emulatoren skal oppdatere seg. Åpne en ny terminal og skriv `yarn build` fra `functions/`-mappen. Alternativt kan du skrive `yarn build:watch`. Da vil TypeScript filene automatisk kompilerers hver gang du lagrer nye endringer.
+
+### Test brukere
+
+Du kan åpne admin-siden på [http://localhost:3000/admin](http://localhost:3000/admin).
+
+Det finnes 3 test brukere i Firebase-emulatoren med forskjellig rettighetsnivårer:
+
+- `user1@readme.no` med full admin-rettigheter (tilsvarende det redaktør og nestleder har)
+- `user2@readme.no` med rettighetene til et vanlig readme-medlem
+- `user3@readme.no` med default rettigheter
+
+Alle brukerene har `password` som passord. Alternativt kan man logge inn med sin egen Abakus-bruker, men merk at man da arver rettighetene man har på [abakus.no](abakus.no).
 
 ## Deploy
 
@@ -111,4 +121,4 @@ Vi bruker [Algolia](https://www.algolia.com/) for å drive søket på nettsiden.
 
 ## Tilganger
 
-For å gjøre endringer i produksjonskonfigurasjonen til Firebase, Vercel, eller Algolia, må du få tilgang av en som allerede har det. Ta kontakt med [Viljan](https://github.com/viljanvr) (alternativt [Øyvind](https://github.com/Oyveloper), [Andreas](https://github.com/AndreasHaaversen) eller [Mats](https://github.com/draperunner)).
+For å gjøre endringer i produksjonskonfigurasjonen til Firebase, Vercel, eller Algolia, må du få tilgang av en som allerede har det. Ta kontakt med [Viljan](https://github.com/viljanvr).
