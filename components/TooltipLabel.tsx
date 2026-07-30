@@ -1,19 +1,15 @@
 import { CircleQuestion } from "@gravity-ui/icons";
 import { Tooltip } from "@heroui/react";
 
-export default function TooltipLabel({
-  labelName,
-  tooltipText,
-}: {
-  labelName: string;
-  tooltipText: string;
-}) {
+export default function LabelTooltip({ tooltipText }: { tooltipText: string }) {
   return (
-    <>
-      <span className="inline align-middle mr-[2px]">{labelName}</span>
-      <Tooltip content={tooltipText} className="max-w-[300px]">
-        <CircleQuestion className="inline align-middle h-[14px] w-[14px] opacity-40" />
-      </Tooltip>
-    </>
+    <Tooltip delay={0}>
+      <Tooltip.Trigger className="relative top-[2px] mx-1 opacity-40">
+        <CircleQuestion width={16} height={16} />
+      </Tooltip.Trigger>
+      <Tooltip.Content>
+        <p>{tooltipText}</p>
+      </Tooltip.Content>
+    </Tooltip>
   );
 }

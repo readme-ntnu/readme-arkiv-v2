@@ -1,7 +1,7 @@
 import { connectSearchBox } from "react-instantsearch-dom";
 import { SearchBoxProvided } from "react-instantsearch-core";
 import { FC } from "react";
-import { Input } from "@heroui/react";
+import { Input, SearchField } from "@heroui/react";
 import { Magnifier } from "@gravity-ui/icons";
 
 // Component is hydration un-safe since theme cannot be known at build time
@@ -9,18 +9,24 @@ import { Magnifier } from "@gravity-ui/icons";
 const PlainSearchBox: FC<SearchBoxProvided> = ({
   currentRefinement,
   refine,
-  isSearchStalled,
 }) => {
   return (
-    <Input
-      isClearable
-      value={currentRefinement}
-      onChange={(event) => refine(event.currentTarget.value)}
-      onClear={() => refine("")}
+    <SearchField
+      name="search"
       className="max-w-[300px] w-full"
-      placeholder="Skriv for å søke ..."
-      startContent={<Magnifier />}
-    />
+      value={currentRefinement}
+      onChange={(value) => refine(value)}
+      aria-label="Artikkel søk"
+    >
+      <SearchField.Group>
+        <Magnifier className="ml-3" />
+        <SearchField.Input
+          className="w-[280px]"
+          placeholder="Skriv for å søke ..."
+        />
+        <SearchField.ClearButton />
+      </SearchField.Group>
+    </SearchField>
   );
 };
 

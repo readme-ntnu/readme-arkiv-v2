@@ -3,7 +3,15 @@
 import { FormEventHandler, useState } from "react";
 import { useSendPasswordResetEmail } from "react-firebase-hooks/auth";
 import { auth } from "../../../lib/Firebase/firebase";
-import { Alert, Button, Form, Input } from "@heroui/react";
+import {
+  Alert,
+  Button,
+  FieldError,
+  Form,
+  InputGroup,
+  Label,
+  TextField,
+} from "@heroui/react";
 import { Envelope } from "@gravity-ui/icons";
 
 export default function PasswordForgetForm() {
@@ -18,37 +26,57 @@ export default function PasswordForgetForm() {
   };
 
   return (
-    <Form onSubmit={onSubmit} className="w-full gap-3">
-      <Input
+    <Form onSubmit={onSubmit} className="flex flex-col w-full gap-5">
+      <TextField
         isRequired
         name="email"
-        placeholder="E-post"
         type="email"
-        radius="full"
-        errorMessage={({ validationDetails, validationErrors }) => {
-          if (validationDetails.typeMismatch)
-            return "Skriv in en gyldid mail adresse.";
-          if (validationDetails.valueMissing) return "Obligatorisk felt.";
-          return validationErrors;
+        className="rounded-full"
+        validate={(value) => {
+          if (!value) return "Obligatorisk felt.";
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            return "Skriv inn en gyldig mail adresse.";
+          }
+
+          return "";
         }}
-        startContent={<Envelope />}
-      />
+      >
+        <Label>E-post</Label>
+        <InputGroup>
+          <InputGroup.Prefix>
+            <Envelope />
+          </InputGroup.Prefix>
+          <InputGroup.Input />
+        </InputGroup>
+        <FieldError />
+      </TextField>
       <Button
         type="submit"
-        variant="solid"
-        color="primary"
-        className="w-full"
-        radius="full"
-        isLoading={sending}
+        variant="primary"
+        className="w-full rounded-full"
+        isPending={sending}
         isDisabled={success}
       >
         Tilbakestill passord
       </Button>
-      {error && <Alert color="danger">{error.message}</Alert>}
+      {error && (
+        <Alert status="danger">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>En feil oppsto!</Alert.Title>
+            <Alert.Description>{error?.message}</Alert.Description>
+          </Alert.Content>
+        </Alert>
+      )}
       {success && (
-        <Alert color="success">
-          E-post sendt! Sjekk innboksen din og følg lenken for å tilbakestille
-          passordet.
+        <Alert status="success">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>E-post sendt!</Alert.Title>
+            <Alert.Description>
+              Sjekk innboksen din og følg lenken for å tilbakestille passordet.
+            </Alert.Description>
+          </Alert.Content>
         </Alert>
       )}
     </Form>

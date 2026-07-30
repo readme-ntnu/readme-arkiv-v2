@@ -6,10 +6,11 @@
     "build": "next build",
     "start": "next start",
     "emulators": "yarn --cwd ./functions build && firebase emulators:start --import=./firebase-fixtures",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
-    "@heroui/react": "^2.8.7",
+    "@heroui/react": "^3.2.2",
+    "@heroui/styles": "^3.2.2",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/fs-extra": "^11.0.4",
     "@types/node-fetch": "^2.6.11",
@@ -20,7 +21,6 @@
     "firebase": "^9.6.3",
     "firebase-admin": "^10.0.2",
     "formik": "^2.2.9",
-    "framer-motion": "^12.23.26",
     "instantsearch.css": "^7.4.5",
     "next": "^16.1.1",
     "next-themes": "^0.4.6",
@@ -43,8 +43,8 @@
     "@types/react-instantsearch-dom": "^6.12.7",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
-    "eslint": "^8.54.0",
-    "eslint-config-next": "^16.1.1",
+    "eslint": "^9",
+    "eslint-config-next": "^16",
     "typescript": "^5.6.3"
   },
   "resolutions": {

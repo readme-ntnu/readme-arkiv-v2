@@ -7,19 +7,45 @@ import * as Yup from "yup";
 import { ISubmitArticleFunction, IEditArticle } from "../../../../lib/types";
 import {
   Alert,
-  Autocomplete,
-  AutocompleteItem,
   Button,
+  ComboBox,
+  FieldError,
   Form,
   Input,
-  NumberInput,
-  Textarea,
+  Label,
+  ListBox,
+  NumberField,
+  Spinner,
+  TextArea,
+  TextField,
 } from "@heroui/react";
-import TooltipLabel from "@/components/TooltipLabel";
+import { Xmark } from "@gravity-ui/icons";
+import React from "react";
+import { ComboBoxStateContext } from "react-aria-components";
+import LabelTooltip from "@/components/TooltipLabel";
 
 interface ArticleFormProps {
   doHandleSubmit: ISubmitArticleFunction;
   article?: IEditArticle;
+}
+
+function ComboBoxClearButton() {
+  let state = React.useContext(ComboBoxStateContext);
+  return (
+    <Button
+      isIconOnly
+      variant="ghost"
+      size="sm"
+      // Don't inherit default Button behavior from ComboBox.
+      slot={null}
+      aria-label="Clear"
+      onPress={() => state?.setInputValue("")}
+      className="absolute right-6 combo-box__trigger bg-transparent p-0"
+      excludeFromTabOrder
+    >
+      <Xmark />
+    </Button>
+  );
 }
 
 export const ArticleForm: FC<ArticleFormProps> = ({
@@ -56,12 +82,12 @@ export const ArticleForm: FC<ArticleFormProps> = ({
     pages: Yup.string()
       .matches(
         new RegExp("^[0-9]+(,\\s{1}[0-9]+)*$"),
-        'Skriv inn som en liste med tall, separert med komma og mellomrom: "10, 12, 13".'
+        'Skriv inn som en liste med tall, separert med komma og mellomrom: "10, 12, 13".',
       )
       .required("Artikkelen må ha sidetall, og de må oppgis på rett form."),
     tags: Yup.string().matches(
       new RegExp("^[\\S]+(,\\s{1}[\\S]+)*$"),
-      'Skriv inn som en liste med ord som beskriver artikkelens innhold, separert med komma og mellomrom: "hei, på, deg".'
+      'Skriv inn som en liste med ord som beskriver artikkelens innhold, separert med komma og mellomrom: "hei, på, deg".',
     ),
   });
 
@@ -93,11 +119,6 @@ export const ArticleForm: FC<ArticleFormProps> = ({
     "Smått & Nett",
   ];
 
-  const columnSuggestionItems = columnSuggestions.map((item) => ({
-    key: item,
-    value: item,
-  }));
-
   return (
     <Formik
       enableReinitialize
@@ -121,19 +142,20 @@ export const ArticleForm: FC<ArticleFormProps> = ({
         isSubmitting,
         resetForm,
         setFieldValue,
+        setFieldTouched,
       }) => {
         const disabled = isSubmitting || status.error || status.success;
 
-        function onPaste(event: ClipboardEvent<HTMLTextAreaElement>) {
+        function onPaste(event: ClipboardEvent<HTMLInputElement>) {
           event.preventDefault();
           const cursorPosition = event.currentTarget.selectionStart ?? 0;
           const text = event.clipboardData.getData("text");
           const trimmedText = text
             .replace(/\s+/g, " ")
-            .replace(/\.^(?!\.\s)/g, ". ")
-            .replace(/,^(?!\.\s)/g, ", ")
-            .replace(/!^(?!!\s)/g, ", ")
-            .replace(/\?^(?!\?\s)/g, ", ")
+            .replace(/\.(?!\s)/g, ". ")
+            .replace(/,(?!\s)/g, ", ")
+            .replace(/!(?!\s)/g, ", ")
+            .replace(/\?(?!\s)/g, ", ")
             .trim();
           const currentText = values.content;
           let textToSet: string;
@@ -152,227 +174,236 @@ export const ArticleForm: FC<ArticleFormProps> = ({
         return (
           <Form
             onSubmit={handleSubmit}
-            className="flex flex-col gap-[15px] max-w-[600px] w-full items-center"
+            className="flex flex-col gap-[15px] max-w-[600px] w-full items-center mb-5"
+            validationErrors={Object.fromEntries(
+              Object.entries(errors)
+                .filter(
+                  ([key]) => touched[key as keyof typeof touched] === true,
+                )
+                .map(([key, value]) => [key, String(value)]),
+            )}
           >
-            <div className="flex gap-[25px] w-full">
-              <Input
-                label="Tittel"
-                labelPlacement="outside"
-                placeholder="Tittel"
+            <div className="flex flex-col md:flex-row gap-[25px] w-full">
+              <TextField
                 name="title"
                 value={values.title}
-                onChange={handleChange}
+                onChange={(value) => setFieldValue("title", value)}
                 onBlur={handleBlur}
-                isDisabled={disabled}
-                isInvalid={touched.title && !!errors.title}
-                errorMessage={errors.title}
                 isRequired
-              />
-              <Autocomplete
-                label={
-                  <TooltipLabel
-                    labelName="Spalte"
-                    tooltipText="Spalten kan være et av forslagene fra listen eller egendefinert ved å skrive inn i feltet."
-                  />
-                }
-                labelPlacement="outside"
-                placeholder="Spalte"
-                name="type"
-                inputValue={values.type}
-                onInputChange={(value) => {
-                  setFieldValue("type", value);
-                }}
-                onBlur={handleBlur}
-                isDisabled={disabled}
-                isInvalid={touched.type && !!errors.type}
-                errorMessage={errors.type}
-                allowsCustomValue
-                defaultItems={columnSuggestionItems}
+                className="flex-1"
               >
-                {(item) => (
-                  <AutocompleteItem key={item.key}>
-                    {item.value}
-                  </AutocompleteItem>
-                )}
-              </Autocomplete>
+                <Label>Tittel</Label>
+                <Input />
+                <FieldError />
+              </TextField>
+              <ComboBox
+                allowsCustomValue
+                allowsEmptyCollection
+                value={values.type}
+                onChange={(value) => setFieldValue("type", value)}
+                onBlur={handleBlur}
+                className="flex-1"
+              >
+                <Label>
+                  Spalte
+                  <LabelTooltip tooltipText="Spalten kan være et av forslagene fra listen eller egendefinert ved å skrive inn i feltet." />
+                </Label>
+                <ComboBox.InputGroup>
+                  <Input placeholder="Ingen spalte valgt" />
+                  <ComboBoxClearButton />
+                  <ComboBox.Trigger />
+                </ComboBox.InputGroup>
+                <ComboBox.Popover>
+                  <ListBox>
+                    {columnSuggestions.map((item) => (
+                      <ListBox.Item key={item} id={item} textValue={item}>
+                        {item}
+                        <ListBox.ItemIndicator />
+                      </ListBox.Item>
+                    ))}
+                  </ListBox>
+                </ComboBox.Popover>
+              </ComboBox>
             </div>
-            <div className="flex gap-[25px] w-full">
-              <NumberInput
-                label="Utgaveår"
-                labelPlacement="outside"
-                placeholder="Utgaveår"
+            <div className="flex flex-col md:flex-row gap-[25px] w-full">
+              <NumberField
                 name="editionYear"
                 value={values.editionYear}
-                onChange={(e) =>
-                  setFieldValue(
-                    "editionYear",
-                    typeof e === "number" ? e : Number(e.target?.value)
-                  )
-                }
-                onBlur={handleBlur}
-                isDisabled={disabled}
-                isInvalid={touched.editionYear && !!errors.editionYear}
-                errorMessage={errors.editionYear}
-                formatOptions={{ useGrouping: false }}
+                onChange={(value) => setFieldValue("editionYear", value)}
+                onBlur={() => setFieldTouched("editionYear", true)}
+                formatOptions={{
+                  useGrouping: false,
+                }}
                 isRequired
-              />
-              <NumberInput
-                label="Utgavenummer"
-                labelPlacement="outside"
-                placeholder="Utgavenummer"
+                className="flex-1"
+              >
+                <Label>Utgaveår</Label>
+                <NumberField.Group>
+                  <NumberField.DecrementButton />
+                  <NumberField.Input />
+                  <NumberField.IncrementButton />
+                </NumberField.Group>
+                <FieldError />
+              </NumberField>
+              <NumberField
                 name="editionNumber"
                 value={values.editionNumber}
-                onChange={(e) =>
-                  setFieldValue(
-                    "editionNumber",
-                    typeof e === "number" ? e : Number(e.target?.value)
-                  )
-                }
-                onBlur={handleBlur}
-                isDisabled={disabled}
-                isInvalid={touched.editionNumber && !!errors.editionNumber}
-                errorMessage={errors.editionNumber}
-                formatOptions={{ useGrouping: false }}
+                onChange={(value) => setFieldValue("editionNumber", value)}
+                onBlur={() => setFieldTouched("editionNumber", true)}
+                formatOptions={{
+                  useGrouping: false,
+                }}
                 isRequired
-              />
+                minValue={1}
+                maxValue={6}
+                className="flex-1"
+              >
+                <Label>Utgavenummer</Label>
+                <NumberField.Group>
+                  <NumberField.DecrementButton />
+                  <NumberField.Input />
+                  <NumberField.IncrementButton />
+                </NumberField.Group>
+                <FieldError>{errors.editionNumber}</FieldError>
+              </NumberField>
             </div>
-            <Input
-              label="Skribent"
-              labelPlacement="outside"
-              placeholder="Skribent"
+            <TextField
               name="author"
               value={values.author}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue("author", value)}
               onBlur={handleBlur}
-              isDisabled={disabled}
-              isInvalid={touched.author && !!errors.author}
-              errorMessage={errors.author}
               isRequired
-            />
-            <Input
-              label="Layout"
-              labelPlacement="outside"
-              placeholder="Layout"
+              className="w-full"
+            >
+              <Label>Skribent</Label>
+              <Input />
+              <FieldError />
+            </TextField>
+            <TextField
               name="layout"
               value={values.layout}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue("layout", value)}
               onBlur={handleBlur}
-              isDisabled={disabled}
-              isInvalid={touched.layout && !!errors.layout}
-              errorMessage={errors.layout}
               isRequired
-            />
-            <Input
-              label="Foto"
-              labelPlacement="outside"
-              placeholder="Foto"
+              className="w-full"
+            >
+              <Label>Layout</Label>
+              <Input />
+              <FieldError />
+            </TextField>
+            <TextField
               name="photo"
               value={values.photo}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue("photo", value)}
               onBlur={handleBlur}
-              isDisabled={disabled}
-              isInvalid={touched.photo && !!errors.photo}
-              errorMessage={errors.photo}
-            />
-            <Textarea
-              label="Tekst"
-              labelPlacement="outside"
-              placeholder="Tekst"
+              className="w-full"
+            >
+              <Label>Foto</Label>
+              <Input />
+              <FieldError />
+            </TextField>
+            <TextField
               name="content"
               value={values.content}
-              onChange={handleChange}
+              onChange={(value) => setFieldValue("content", value)}
               onBlur={handleBlur}
-              isDisabled={disabled}
-              isInvalid={touched.content && !!errors.content}
-              errorMessage={errors.content}
+              onPaste={onPaste}
+              className="w-full"
               isRequired
-            />
-            <div className="flex gap-[25px] w-full">
-              <Input
-                label={
-                  <TooltipLabel
-                    labelName="Sidetall"
-                    tooltipText='Skriv inn som en liste med tall, separert med komma og mellomrom: "10, 12, 13".'
-                  />
-                }
-                labelPlacement="outside"
-                placeholder="Sidetall"
+            >
+              <Label>
+                Tekst
+                <LabelTooltip tooltipText="Lim inn brødteksten fra artikkelen. Blir brukt til indeksering av søkeresultater." />
+              </Label>
+              <TextArea />
+              <FieldError />
+            </TextField>
+            <div className="flex flex-col md:flex-row gap-[25px] w-full">
+              <TextField
                 name="pages"
                 value={values.pages}
-                onChange={handleChange}
+                onChange={(value) => setFieldValue("pages", value)}
                 onBlur={handleBlur}
-                isDisabled={disabled}
-                isInvalid={touched.pages && !!errors.pages}
-                errorMessage={errors.pages}
                 isRequired
-              />
-              <Input
-                label={
-                  <TooltipLabel
-                    labelName="Tags"
-                    tooltipText='Skriv inn som en liste med ord som beskriver artikkelens
-                  innhold, separert med komma og mellomrom: "hei, på, deg".'
-                  />
-                }
-                labelPlacement="outside"
-                placeholder="Tags"
+                className="flex-1"
+              >
+                <Label>
+                  Sidetall
+                  <LabelTooltip tooltipText='Skriv inn som en liste med tall, separert med komma og mellomrom: "10, 12, 13".' />
+                </Label>
+                <Input />
+                <FieldError />
+              </TextField>
+              <TextField
                 name="tags"
                 value={values.tags}
-                onChange={handleChange}
+                onChange={(value) => setFieldValue("tags", value)}
                 onBlur={handleBlur}
-                isDisabled={disabled}
-                isInvalid={touched.tags && !!errors.tags}
-                errorMessage={errors.tags}
-              />
+                className="flex-1"
+              >
+                <Label>
+                  Tags
+                  <LabelTooltip tooltipText='Skriv inn som en liste med ord som beskriver artikkelens innhold, separert med komma og mellomrom: "hei, på, deg".' />
+                </Label>
+                <Input />
+                <FieldError />
+              </TextField>
             </div>
             <Button
               type="submit"
-              variant="solid"
-              color="primary"
-              className="w-[200px] mt-[20px]"
-              radius="full"
+              variant="primary"
+              className="w-[200px] mt-[10px] rounded-full"
               isDisabled={!isValid || disabled}
-              isLoading={isSubmitting}
+              isPending={isSubmitting}
             >
-              {isSubmitting
-                ? "Laster"
-                : !article
-                  ? "Legg til artikkel"
-                  : "Oppdater artikkel"}
+              {isSubmitting ? (
+                <>
+                  <Spinner color="current" /> Laster
+                </>
+              ) : !article ? (
+                "Legg til artikkel"
+              ) : (
+                "Oppdater artikkel"
+              )}
             </Button>
             {status.error && (
-              <Alert
-                color="danger"
-                title="Oups!"
-                description="Noe gikk galt. Husket du å laste opp PDF-en først? Man kan ikke opprette en artikkel uten tilhørende utgave i databasen."
-              />
+              <Alert status="danger">
+                <Alert.Indicator />
+                <Alert.Content>
+                  <Alert.Title>Noe gikk galt!</Alert.Title>
+                  <Alert.Description>
+                    Husket du å laste opp PDF-en først? Man kan ikke opprette en
+                    artikkel uten tilhørende utgave i databasen.
+                  </Alert.Description>
+                </Alert.Content>
+              </Alert>
             )}
             {status.success && (
-              <Alert
-                color="success"
-                title={
-                  article ? "Artikkel er endret!" : "Artikkel er lagt til!"
-                }
-                description={
-                  !article &&
-                  "Tøm skjemaet dersom du ønsker å legge til enda en artikkel."
-                }
-                endContent={
-                  !article && (
+              <Alert status="success">
+                <Alert.Indicator />
+                <Alert.Content>
+                  <Alert.Title>
+                    {article ? "Artikkel er endret!" : "Artikkel er lagt til!"}
+                  </Alert.Title>
+                  <Alert.Description>
+                    {!article &&
+                      "Tøm skjemaet dersom du ønsker å legge til enda en artikkel."}
+                  </Alert.Description>
+                  {!article && (
                     <Button
-                      variant="flat"
-                      color="success"
-                      className="min-w-[110px]"
+                      size="sm"
+                      variant="tertiary"
                       onPress={() => {
                         resetForm();
                         setStatus({ success: false });
                       }}
+                      className="mt-2"
                     >
                       Tøm skjema
                     </Button>
-                  )
-                }
-              />
+                  )}
+                </Alert.Content>
+              </Alert>
             )}
           </Form>
         );

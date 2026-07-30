@@ -1,19 +1,13 @@
 "use client";
 
 import {
+  AlertDialog,
   Button,
   Card,
-  CardBody,
+  Spinner,
+  toast,
   Tooltip,
-  Image,
-  Link,
-  Modal,
-  ModalContent,
-  ModalFooter,
-  ModalBody,
-  ModalHeader,
-  useDisclosure,
-  addToast,
+  useOverlayState,
 } from "@heroui/react";
 import { FC, useState } from "react";
 import { deleteEdition } from "../../../../lib/Firebase/firebaseClientAPIs";
@@ -26,35 +20,38 @@ const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
   editionData,
 }) => {
   const router = useRouter();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const overlayState = useOverlayState();
   const [selectedEdition, setSelectedEdition] = useState<string | undefined>();
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const handleOpenDeleteModal = (edition: string) => {
     setSelectedEdition(edition);
-    onOpen();
+    overlayState.open();
   };
 
   const handleDeleteEdition = (edition: string) => {
+    setIsDeleteLoading(true);
     deleteEdition(edition)
       .then(() => {
-        addToast({
-          title: `Utgave ${edition} er slettet!`,
-          description:
-            "Merk at det kan ta 5-10 minutter før endringen er synlig på forsiden.",
-          color: "success",
-          timeout: 10000,
-        });
+        setIsDeleteLoading(false);
+        overlayState.close();
+        toast.success(
+          <>
+            Utgave <strong>{edition}</strong> er slettet!
+          </>,
+        );
         router.refresh();
       })
       .catch((error) => {
-        addToast({
-          title: `Kunne ikke slette utgave ${edition}!`,
-          description:
-            "Kun redaktør, nestleder og webansvarlig har tilgang til å slette utgaver. Ta kontakt med webansvarlig dersom du mener noe er feil.",
-          color: "danger",
-          timeout: 15000,
-        });
-        console.log(error);
+        setIsDeleteLoading(false);
+        overlayState.close();
+        toast.danger(
+          <>
+            Kunne ikke slette utgave <strong>{edition}</strong>! Kun redaktør,
+            nestleder og webansvarlig har tilgang til å slette utgaver. Ta
+            kontakt med webansvarlig dersom du mener noe er feil.
+          </>,
+        );
       });
   };
 
@@ -79,36 +76,46 @@ const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
           </React.Fragment>
         ))}
       </div>
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        onClose={() => setSelectedEdition(undefined)}
+      <AlertDialog.Backdrop
+        isOpen={overlayState.isOpen}
+        onOpenChange={overlayState.setOpen}
       >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader>Slett utgave</ModalHeader>
-              <ModalBody>
-                <p>Er du sikker på at du vil slette {selectedEdition}?</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="default" onPress={onClose}>
-                  Avbryt
-                </Button>
-                <Button
-                  color="danger"
-                  onPress={() => {
-                    selectedEdition && handleDeleteEdition(selectedEdition);
-                    onClose();
-                  }}
-                >
-                  Slett
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+        <AlertDialog.Container>
+          <AlertDialog.Dialog>
+            <AlertDialog.CloseTrigger />
+            <AlertDialog.Header>
+              <AlertDialog.Icon status="danger" />
+              <AlertDialog.Heading>Slett utgave?</AlertDialog.Heading>
+            </AlertDialog.Header>
+            <AlertDialog.Body>
+              <p>
+                Er du sikker på at du vil slette{" "}
+                <strong>utgave {selectedEdition}?</strong>
+              </p>
+            </AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button slot="close" variant="tertiary">
+                Avbryt
+              </Button>
+              <Button
+                variant="danger"
+                onPress={() => {
+                  selectedEdition && handleDeleteEdition(selectedEdition);
+                }}
+              >
+                {isDeleteLoading ? (
+                  <>
+                    <Spinner color="current" />
+                    Laster
+                  </>
+                ) : (
+                  "Slett"
+                )}
+              </Button>
+            </AlertDialog.Footer>
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
     </>
   );
 };
@@ -118,30 +125,39 @@ const EditionCard: FC<{
   edition: IEdition;
   onDeletePressed: () => void;
 }> = ({ year, edition, onDeletePressed }) => (
-  <Card isFooterBlurred radius="sm">
-    <CardBody className="flex flex-row gap-[20px] items-center p-3">
-      <Image src={edition.imageUrl} width={50} className="rounded-none" />
+  <Card className="overflow-hidden rounded-xl">
+    <Card.Content className="flex flex-row gap-[20px] items-center">
+      <img
+        src={edition.imageUrl}
+        alt={`Utgave ${edition.edition}`}
+        width={50}
+        className="rounded-none"
+      />
       <span className="font-bold grow">{`Utgave ${edition.edition}`}</span>
       <div className="flex gap-[10px] m-2">
-        <Tooltip content="Åpne opp i ny fane" delay={1000}>
-          <Button
-            color="default"
-            variant="bordered"
-            isIconOnly
-            startContent={<ArrowUpRightFromSquare />}
-          />
+        <Tooltip delay={1000}>
+          <Tooltip.Trigger>
+            <Button variant="tertiary" isIconOnly className="rounded-full">
+              <ArrowUpRightFromSquare />
+            </Button>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Åpne opp i ny fane</Tooltip.Content>
         </Tooltip>
-        <Tooltip content="Slett utgave" color="danger" delay={1000}>
-          <Button
-            color="danger"
-            variant="flat"
-            isIconOnly
-            startContent={<TrashBin />}
-            onPress={onDeletePressed}
-          />
+        <Tooltip delay={1000}>
+          <Tooltip.Trigger>
+            <Button
+              variant="danger"
+              isIconOnly
+              className="rounded-full"
+              onPress={onDeletePressed}
+            >
+              <TrashBin />
+            </Button>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Slett utgave</Tooltip.Content>
         </Tooltip>
       </div>
-    </CardBody>
+    </Card.Content>
   </Card>
 );
 

@@ -1,41 +1,28 @@
 "use client";
 
 import {
-  addToast,
+  AlertDialog,
   Button,
-  ButtonGroup,
+  buttonVariants,
   Chip,
-  Link,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
+  cn,
+  Pagination,
   Spinner,
   Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
+  toast,
   Tooltip,
+  useOverlayState,
 } from "@heroui/react";
-import { FC, Key, useState } from "react";
+import { useState } from "react";
 import { ROUTES } from "../../../../utils/routes";
 import {
   deleteArticle,
   getPageNumber,
 } from "../../../../lib/Firebase/firebaseClientAPIs";
 import { IArticle } from "../../../../lib/types";
-import React from "react";
 import { useArticleList } from "../../../../lib/Firebase/hooks";
-import {
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpRightFromSquare,
-  Pencil,
-  TrashBin,
-} from "@gravity-ui/icons";
+import { ArrowUpRightFromSquare, Pencil, TrashBin } from "@gravity-ui/icons";
+import Link from "next/link";
 
 export default function ArticleOverview() {
   const [data, loading, error, pageNum, nextPage, prevPage] = useArticleList();
@@ -44,173 +31,188 @@ export default function ArticleOverview() {
     IArticle | undefined
   >();
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const deleteModalState = useOverlayState();
 
   const handleDeleteActiveArticle = () => {
     setIsDeleteLoading(true);
     deleteModalActiveArticle &&
       deleteArticle(deleteModalActiveArticle.id).then(() => {
-        addToast({
-          title: (
-            <p>
-              Artikkelen{" "}
-              <span className="italic">{deleteModalActiveArticle.title}</span>{" "}
-              er slettet!
-            </p>
-          ),
-          color: "success",
-        });
+        deleteModalState.close();
+        toast.success(
+          <>
+            Artikkelen <strong>{deleteModalActiveArticle.title}</strong> er
+            slettet!
+          </>,
+        );
         setIsDeleteLoading(false);
         setDeleteModalActiveArticle(undefined);
       });
   };
 
-  const renderCell = React.useCallback((article: IArticle, columnKey: Key) => {
-    switch (columnKey) {
-      case "edition":
-        return (
-          <Chip color="primary" size="sm" variant="flat">
-            {article.edition}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-[0px]">
-            <Tooltip content="Åpne artikkel i utgave">
-              <Button
-                isIconOnly
-                radius="full"
-                variant="light"
-                size="sm"
-                as={Link}
-                href={
-                  ROUTES.EDITION.replace(":id", article.edition) +
-                  `#page=${getPageNumber(article)}`
-                }
-                className="text-foreground-500"
-                startContent={<ArrowUpRightFromSquare />}
-              ></Button>
-            </Tooltip>
-            <Tooltip content="Rediger artikkel">
-              <Button
-                isIconOnly
-                radius="full"
-                variant="light"
-                size="sm"
-                as={Link}
-                href={ROUTES.EDIT_ARTICLE.replace(":id", article.id)}
-                className="text-foreground-500"
-                startContent={<Pencil />}
-              ></Button>
-            </Tooltip>
-            <Tooltip color="danger" content="Slett artikkel">
-              <Button
-                isIconOnly
-                radius="full"
-                variant="light"
-                size="sm"
-                color="danger"
-                onPress={() => setDeleteModalActiveArticle(article)}
-                startContent={<TrashBin />}
-              ></Button>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return article[columnKey as keyof IArticle];
-    }
-  }, []);
-
   return (
     <>
-      <Table
-        aria-label="Artikkel tabell"
-        isStriped
-        classNames={{
-          wrapper: "shadow-none p-0 rounded-sm",
-        }}
-      >
-        <TableHeader>
-          <TableColumn key={"title"}>Tittel</TableColumn>
-          <TableColumn key={"edition"} width={90}>
-            Utgave
-          </TableColumn>
-          <TableColumn key={"author"} className="hidden sm:table-cell">
-            Forfatter
-          </TableColumn>
-          <TableColumn key={"layout"} className="hidden sm:table-cell">
-            Layout
-          </TableColumn>
-          <TableColumn key={"actions"} width={50} align="center">
-            Handlinger
-          </TableColumn>
-        </TableHeader>
-        <TableBody
-          items={data ?? []}
-          isLoading={loading}
-          loadingContent={<Spinner color="primary"></Spinner>}
-        >
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => (
-                <TableCell
-                  className={
-                    columnKey == "author" || columnKey == "layout"
-                      ? "hidden sm:table-cell"
-                      : ""
-                  }
-                >
-                  {renderCell(item, columnKey)}
-                </TableCell>
+      <Table className="w-full" variant="secondary">
+        <Table.ScrollContainer>
+          <Table.Content aria-label="Artikkel tabell">
+            <Table.Header>
+              <Table.Column isRowHeader key={"title"}>
+                Tittel
+              </Table.Column>
+              <Table.Column key={"edition"} className="w-[100px]">
+                Utgave
+              </Table.Column>
+              <Table.Column key={"author"} className="hidden md:table-cell">
+                Forfatter
+              </Table.Column>
+              <Table.Column key={"layout"} className="hidden md:table-cell">
+                Layout
+              </Table.Column>
+              <Table.Column key={"actions"} className="w-[50px] text-center">
+                Handlinger
+              </Table.Column>
+            </Table.Header>
+            <Table.Body items={data}>
+              {(item) => (
+                <Table.Row key={item.id}>
+                  <Table.Cell>{item.title}</Table.Cell>
+                  <Table.Cell>
+                    <Chip color="accent" variant="soft" size="sm">
+                      {item.edition}
+                    </Chip>
+                  </Table.Cell>
+                  <Table.Cell className="hidden md:table-cell">
+                    {item.author}
+                  </Table.Cell>
+                  <Table.Cell className="hidden md:table-cell">
+                    {item.layout}
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="relative flex items-center gap-[0px]">
+                      <Tooltip>
+                        <Tooltip.Trigger>
+                          <Link
+                            href={
+                              ROUTES.EDITION.replace(":id", item.edition) +
+                              `#page=${getPageNumber(item)}`
+                            }
+                            className={cn(
+                              buttonVariants({
+                                variant: "ghost",
+                                isIconOnly: true,
+                                size: "sm",
+                              }),
+                            )}
+                          >
+                            <ArrowUpRightFromSquare />
+                          </Link>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content>
+                          Åpne artikkel i utgave
+                        </Tooltip.Content>
+                      </Tooltip>
+                      <Tooltip>
+                        <Tooltip.Trigger>
+                          <Link
+                            href={ROUTES.EDIT_ARTICLE.replace(":id", item.id)}
+                            className={cn(
+                              buttonVariants({
+                                variant: "ghost",
+                                isIconOnly: true,
+                                size: "sm",
+                              }),
+                            )}
+                          >
+                            <Pencil />
+                          </Link>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content>Rediger artikkel</Tooltip.Content>
+                      </Tooltip>
+                      <Tooltip>
+                        <Tooltip.Trigger>
+                          <Button
+                            isIconOnly
+                            variant="ghost"
+                            size="sm"
+                            onPress={() => {
+                              setDeleteModalActiveArticle(item);
+                              deleteModalState.open();
+                            }}
+                            className="rounded-full ml-1 text-danger"
+                          >
+                            <TrashBin />
+                          </Button>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content>Slett artikkel</Tooltip.Content>
+                      </Tooltip>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
               )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <ButtonGroup size="sm" color="primary" radius="full">
-        <Button
-          onPress={prevPage}
-          isDisabled={pageNum === 0}
-          startContent={<ArrowLeft />}
-        >
-          Forrige
-        </Button>
-        <Button onPress={nextPage} endContent={<ArrowRight />}>
-          Neste
-        </Button>
-      </ButtonGroup>
-      <Modal
-        isOpen={!!deleteModalActiveArticle}
-        onClose={() => setDeleteModalActiveArticle(undefined)}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader>Slett artikkel</ModalHeader>
-              <ModalBody>
-                <span>
-                  Er du sikker på at du vil slette artikkelen{" "}
-                  <span className="italic">
-                    {deleteModalActiveArticle?.title}
-                  </span>
-                  ?
-                </span>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="default" onPress={onClose}>
-                  Avbryt
-                </Button>
-                <Button
-                  color="danger"
-                  onPress={handleDeleteActiveArticle}
-                  isLoading={isDeleteLoading}
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
+        <Table.Footer>
+          <Pagination className="w-full flex justify-center">
+            <Pagination.Content>
+              <Pagination.Item>
+                <Pagination.Previous
+                  isDisabled={pageNum === 0}
+                  onPress={prevPage}
                 >
-                  Slett
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+                  <Pagination.PreviousIcon />
+                  <span>Prev</span>
+                </Pagination.Previous>
+              </Pagination.Item>
+              <Pagination.Item>
+                <Pagination.Next onPress={nextPage}>
+                  <span>Next</span>
+                  <Pagination.NextIcon />
+                </Pagination.Next>
+              </Pagination.Item>
+            </Pagination.Content>
+          </Pagination>
+        </Table.Footer>
+      </Table>
+      <AlertDialog.Backdrop
+        isDismissable
+        isOpen={deleteModalState.isOpen}
+        onOpenChange={deleteModalState.setOpen}
+      >
+        <AlertDialog.Container>
+          <AlertDialog.Dialog>
+            <AlertDialog.CloseTrigger />
+            <AlertDialog.Header>
+              <AlertDialog.Icon status="danger" />
+              <AlertDialog.Heading>Slett artikkel</AlertDialog.Heading>
+            </AlertDialog.Header>
+            <AlertDialog.Body>
+              <span>
+                Er du sikker på at du vil slette artikkelen{" "}
+                <strong>{deleteModalActiveArticle?.title}</strong>?
+              </span>
+            </AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button variant="tertiary" slot="close">
+                Avbryt
+              </Button>
+              <Button
+                variant="danger"
+                onPress={handleDeleteActiveArticle}
+                isPending={isDeleteLoading}
+              >
+                {isDeleteLoading ? (
+                  <>
+                    <Spinner color="current" />
+                    Laster
+                  </>
+                ) : (
+                  "Slett"
+                )}
+              </Button>
+            </AlertDialog.Footer>
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
     </>
   );
 }

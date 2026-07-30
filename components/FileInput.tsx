@@ -1,5 +1,4 @@
-import { NextPage } from "next";
-import { Button, NumberInput } from "@heroui/react";
+import { Button, ErrorMessage, Label } from "@heroui/react";
 import { FC } from "react";
 import { Xmark, File, ArrowUpFromSquare } from "@gravity-ui/icons";
 
@@ -7,7 +6,7 @@ interface FileInputProps {
   value: File | undefined;
   onChange: (file: File | undefined) => void;
   label?: string;
-  isRequired: boolean;
+  isRequired?: boolean;
   error?: boolean;
   errorMessage?: string | string[];
   isDisabled?: boolean;
@@ -25,28 +24,28 @@ export const FileInput: FC<FileInputProps> = ({
   acceptFormat,
 }) => {
   return (
-    <div className={`flex flex-col w-full gap-[5px] ${error && "text-danger"}`}>
+    <div className={`flex flex-col w-full gap-[5px]`}>
       {label && (
-        <label
-          className={`text-small font-medium ${
-            isRequired && "after:content-['*'] after:text-danger"
-          } ${isDisabled && "opacity-disabled"}`}
+        <Label
+          isRequired={isRequired}
+          isInvalid={error}
+          isDisabled={isDisabled}
         >
           {label}
-        </label>
+        </Label>
       )}
       <div
-        className={`w-full h-[150px]  ${
-          error ? "bg-danger-50" : "bg-default-100"
-        } rounded-medium ${isDisabled && "opacity-disabled"}`}
+      // className={`w-full h-[150px]  ${
+      //   error ? "bg-danger-50" : "bg-default-100"
+      // } rounded-medium ${isDisabled && "opacity-disabled"}`}
       >
         {!value ? (
           <>
             <label
               htmlFor="dropzone-file"
-              className={`w-full h-full flex flex-col items-center justify-center cursor-pointer rounded-medium ${
-                error ? "hover:bg-danger-100" : "hover:bg-default-200"
-              }`}
+              className={
+                "w-full h-full flex flex-col items-center justify-center input-group p-4"
+              }
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 e.preventDefault();
@@ -55,6 +54,8 @@ export const FileInput: FC<FileInputProps> = ({
                   onChange(file);
                 }
               }}
+              data-invalid={error}
+              data-disabled={isDisabled}
             >
               <ArrowUpFromSquare height={20} width={20} className="mb-2" />
               <span className="font-semibold">Trykk for å laste opp</span>
@@ -73,7 +74,7 @@ export const FileInput: FC<FileInputProps> = ({
             />
           </>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center">
+          <div className="w-full h-full flex flex-col items-center justify-center input-group p-4">
             <File height={20} width={20} className="mb-2" />
             <span className="flex items-center gap-[5px]">
               <span className="truncate max-w-[220px] text-default-foreground">
@@ -81,11 +82,12 @@ export const FileInput: FC<FileInputProps> = ({
               </span>
               <Button
                 isIconOnly
-                variant="light"
-                radius="full"
+                variant="ghost"
+                className="rounded-full"
                 onPress={() => onChange(undefined)}
                 isDisabled={isDisabled}
                 size="sm"
+                aria-label="Fjern fil"
               >
                 <Xmark />
               </Button>
@@ -94,10 +96,12 @@ export const FileInput: FC<FileInputProps> = ({
         )}
       </div>
       {error && (
-        <span className="text-tiny flex flex-col">
-          {Array.isArray(errorMessage)
-            ? errorMessage.map((error, i) => <span key={i}>{error}</span>)
-            : errorMessage}
+        <span className="flex flex-col">
+          {(Array.isArray(errorMessage) ? errorMessage : [errorMessage]).map(
+            (error, i) => (
+              <ErrorMessage key={i}>{error}</ErrorMessage>
+            ),
+          )}
         </span>
       )}
     </div>

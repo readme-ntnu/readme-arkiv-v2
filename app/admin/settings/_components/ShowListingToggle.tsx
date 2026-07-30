@@ -2,7 +2,7 @@
 
 import { FC } from "react";
 import { useSettings } from "../../../../lib/Firebase/hooks";
-import { addToast, Spinner, Switch, Tooltip } from "@heroui/react";
+import { Description, Switch, toast } from "@heroui/react";
 
 export const ShowListingToggle: FC = () => {
   const [settings, loading, _, updateSettings] = useSettings();
@@ -10,32 +10,30 @@ export const ShowListingToggle: FC = () => {
   function toggleShowListing() {
     updateSettings({ ...settings, showListing: !settings?.showListing }).then(
       () =>
-        addToast({
-          title: "Instilling er oppdatert",
+        toast.success("Instilling er oppdatert", {
           description:
             "Det kan ta 5-10 minutter før endringer blir synlig på forsiden.",
-          color: "success",
           timeout: 5000,
-        })
+        }),
     );
   }
   return (
-    <div className="flex items-center gap-[10px]">
-      <Tooltip
-        content={
-          "Brukes for å vise/skjule Listingsløp utgaver på arkivets forside."
-        }
+    <div className="flex flex-col items-start gap-[8px]">
+      <Switch
+        onChange={toggleShowListing}
+        isSelected={settings?.showListing ?? false}
+        isDisabled={loading}
       >
-        <span>Vis listingutgaver:</span>
-      </Tooltip>
-      {loading ? (
-        <Spinner variant="dots" className="w-[48px]" />
-      ) : (
-        <Switch
-          onChange={toggleShowListing}
-          isSelected={settings?.showListing}
-        />
-      )}
+        <Switch.Content>
+          Vis listingutgaver:
+          <Switch.Control>
+            <Switch.Thumb />
+          </Switch.Control>
+        </Switch.Content>
+      </Switch>
+      <Description>
+        Brukes for å vise/skjule Listingsløp utgaver på arkivets forside.
+      </Description>
     </div>
   );
 };

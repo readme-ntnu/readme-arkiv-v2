@@ -19,7 +19,10 @@ const functions = getFunctions(app);
 
 const db = getFirestore(app);
 
-if (process.env.NODE_ENV !== "production") {
+if (
+  process.env.VERCEL_ENV !== "production" &&
+  process.env.VERCEL_ENV !== "preview"
+) {
   connectStorageEmulator(storage, "localhost", 9199);
   connectAuthEmulator(auth, "http://localhost:9099");
   connectFirestoreEmulator(db, "localhost", 8080);

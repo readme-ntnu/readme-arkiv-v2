@@ -2,7 +2,8 @@
 
 import { WithAuthentication } from "@/components/WithAuthentication";
 import { BookOpen, FileText, Gear } from "@gravity-ui/icons";
-import { Tab, Tabs } from "@heroui/react";
+import { Tabs } from "@heroui/react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import { ROUTES } from "utils/routes";
@@ -22,51 +23,46 @@ export default function AdminLayout({
 
   return (
     <WithAuthentication>
-      <div className="max-w-[1200px] w-full -mt-5">
+      <div className="max-w-[1200px] w-full">
         <Tabs
-          radius="full"
-          color="primary"
-          variant="underlined"
+          className="w-full mb-3"
+          variant="secondary"
           selectedKey={currentTab}
-          classNames={{
-            base: "w-full mb-5",
-            tabList:
-              "gap-7 w-full relative rounded-none p-0 border-b border-divider",
-            tab: "max-w-fit px-0 h-12",
-            tabContent:
-              "group-data-[selected=true]:text-default-foreground text-default-500 font-semibold flex gap-[6px] items-center",
-          }}
         >
-          <Tab
-            key={ROUTES.EDITION_LIST}
-            href={ROUTES.EDITION_LIST}
-            title={
-              <>
-                <BookOpen />
+          <Tabs.ListContainer>
+            <Tabs.List aria-label="Options">
+              <Tabs.Tab
+                href={ROUTES.EDITION_LIST}
+                id={ROUTES.EDITION_LIST}
+                render={(domProps: any) => <Link {...domProps} />}
+                className="w-[130px]"
+              >
+                <BookOpen className="mr-2" />
                 Utgaver
-              </>
-            }
-          />
-          <Tab
-            key={ROUTES.ARTICLE_LIST}
-            href={ROUTES.ARTICLE_LIST}
-            title={
-              <>
-                <FileText />
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab
+                href={ROUTES.ARTICLE_LIST}
+                id={ROUTES.ARTICLE_LIST}
+                render={(domProps: any) => <Link {...domProps} />}
+                className="w-[130px]"
+              >
+                <FileText className="mr-2" />
                 Artikler
-              </>
-            }
-          />
-          <Tab
-            key={ROUTES.SETTINGS}
-            href={ROUTES.SETTINGS}
-            title={
-              <>
-                <Gear />
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab
+                href={ROUTES.SETTINGS}
+                id={ROUTES.SETTINGS}
+                render={(domProps: any) => <Link {...domProps} />}
+                className="w-[130px]"
+              >
+                <Gear className="mr-2" />
                 Instillinger
-              </>
-            }
-          />
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            </Tabs.List>
+          </Tabs.ListContainer>
         </Tabs>
         {children}
       </div>
