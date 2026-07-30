@@ -14,6 +14,7 @@
   --field-background: oklch(100.00% 0.0000 28.32);
   --default: oklch(87.11% 0.0055 286.29);
   --separator: oklch(92.00% 0.0024 28.32);
+  --overlay: oklch(100.00% 0.0004 28.32);
 
 }
 
@@ -28,6 +29,7 @@
   --field-background: oklch(27.39% 0.0055 286.03);
   --default: oklch(37.03% 0.0119 285.81);
   --separator: oklch(29.522% 0.00289 16.682);
+  --overlay: oklch(24.039% 0.00151 16.27);
 }
 
 @font-face {
