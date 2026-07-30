@@ -6,7 +6,7 @@ import { ROUTES } from "../utils/routes";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../lib/Firebase/firebase";
 import { signOut } from "firebase/auth";
-import { Button, Dropdown, Separator, buttonVariants, cn } from "@heroui/react";
+import { Avatar, Button, Dropdown, buttonVariants, cn } from "@heroui/react";
 import { ReadmeLogo } from "./ReadmeLogo";
 import {
   Bars,
@@ -15,6 +15,7 @@ import {
   ArrowRightFromSquare,
   ArrowUpRightFromSquare,
   PersonGear,
+  Person,
 } from "@gravity-ui/icons";
 import Link from "next/link";
 
@@ -49,38 +50,65 @@ export const NavBar: FC = () => {
             {isOpen ? <Xmark /> : <Bars />}
           </Button>
           <Dropdown.Popover placement={"bottom right"}>
+            {!loading && user ? (
+              <div className="px-3 pt-3 pb-1">
+                <div className="flex items-center gap-2">
+                  <Avatar size="sm" color="accent" variant="soft">
+                    {user.photoURL && (
+                      <Avatar.Image alt="Jane" src={user.photoURL} />
+                    )}
+                    <Avatar.Fallback delayMs={600}>
+                      <Person />
+                    </Avatar.Fallback>
+                  </Avatar>
+                  <div className="flex flex-col gap-0">
+                    <p className="text-sm leading-5 font-medium">
+                      {user.displayName || user.email}
+                    </p>
+                    <p className="text-xs leading-none text-muted">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
             <Dropdown.Menu>
-              <Dropdown.Item key="search" className="text-foreground">
-                <Magnifier />
-                <Link href={ROUTES.SEARCH}>Artikkelsøk</Link>
+              <Dropdown.Item key="search">
+                <Link
+                  href={ROUTES.SEARCH}
+                  className="text-foreground flex w-full items-center justify-between gap-2"
+                >
+                  Artikkelsøk
+                  <Magnifier className="text-muted" />
+                </Link>
               </Dropdown.Item>
-              <Dropdown.Item
-                // showDivider={!loading && !!user}
-                key="abakus"
-                className="text-foreground"
-                href="https://abakus.no/"
-              >
-                <ArrowUpRightFromSquare />
-                Abakus.no
+              <Dropdown.Item key="abakus">
+                <Link
+                  href="https://abakus.no/"
+                  className="text-foreground flex w-full items-center justify-between gap-2"
+                >
+                  Abakus.no
+                  <ArrowUpRightFromSquare className="text-muted" />
+                </Link>
               </Dropdown.Item>
               {!loading && user ? (
                 <>
-                  <Separator />
-                  <Dropdown.Item
-                    key="edition_list"
-                    className="text-foreground"
-                    href={ROUTES.ADMIN}
-                  >
-                    <PersonGear />
-                    Admin
+                  <Dropdown.Item key="edition_list">
+                    <Link
+                      href={ROUTES.ADMIN}
+                      className="text-foreground flex w-full items-center justify-between gap-2"
+                    >
+                      Admin
+                      <PersonGear className="text-muted" />
+                    </Link>
                   </Dropdown.Item>
                   <Dropdown.Item
                     key="logout"
-                    className="text-danger"
+                    className="text-danger flex w-full items-center justify-between gap-2"
                     onPress={() => signOut(auth)}
                   >
-                    <ArrowRightFromSquare />
                     Log ut
+                    <ArrowRightFromSquare />
                   </Dropdown.Item>
                 </>
               ) : null}

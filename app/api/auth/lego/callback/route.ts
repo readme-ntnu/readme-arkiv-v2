@@ -55,8 +55,7 @@ export async function GET(request: Request) {
 
   const legoUser = await userRes.json();
 
-  // 3. Create Firebase custom token
-
+  // 3. Check membership
   const readmeMembership = legoUser.memberships.find(
     (m: any) => m.abakusGroup === 10,
   );
@@ -67,10 +66,34 @@ export async function GET(request: Request) {
     );
   }
 
-  const firebaseToken = await auth.createCustomToken(`lego:${legoUser.id}`, {
-    username: legoUser.username,
-    email: legoUser.email,
-    name: legoUser.fullName,
+  const uid = `lego:${legoUser.id}`;
+
+  // 4. Ensure Firebase user exists, and update if necessary
+  try {
+    const firebaseUser = await auth.getUser(uid);
+
+    if (
+      firebaseUser.email !== legoUser.email ||
+      firebaseUser.displayName !== legoUser.fullName ||
+      firebaseUser.photoURL !== legoUser.profilePicture
+    ) {
+      await auth.updateUser(uid, {
+        email: legoUser.email,
+        displayName: legoUser.fullName,
+        photoURL: legoUser.profilePicture,
+      });
+    }
+  } catch {
+    await auth.createUser({
+      uid,
+      email: legoUser.email,
+      displayName: legoUser.fullName,
+      photoURL: legoUser.profilePicture,
+    });
+  }
+
+  // 5. Create Firebase custom token
+  const firebaseToken = await auth.createCustomToken(uid, {
     provider: "lego",
     readmeMember: !!readmeMembership,
     readmeRole: readmeMembership && readmeMembership.role,
