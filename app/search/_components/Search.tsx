@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 
 const searchClient = algoliasearch(
   "K9OSMLFRD3",
-  "e9162c9f16b6ca303aa413e062713697"
+  "e9162c9f16b6ca303aa413e062713697",
 );
 
 export default function Search() {

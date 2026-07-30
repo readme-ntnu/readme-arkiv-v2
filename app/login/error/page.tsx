@@ -3,10 +3,11 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import redaktør from "../../../public/images/redaktør.png";
-import { Button, Link, Spacer, Spinner } from "@heroui/react";
 import { ROUTES } from "utils/routes";
 import { useSearchParams } from "next/navigation";
 import { readmeIfy } from "@/components/ReadmeLogo";
+import Link from "next/link";
+import { buttonVariants, cn } from "@heroui/styles";
 
 function ErrorContent() {
   const searchParams = useSearchParams();
@@ -24,10 +25,13 @@ function ErrorContent() {
             "Ta kontakt med kontakt ansvarlig utvikler dersom problemet vedvarer.",
         )}
       </p>
-      <Spacer />
-      <Button as={Link} href={ROUTES.HOME} radius="full" color="primary">
+      <div className="h-4" />
+      <Link
+        href={ROUTES.HOME}
+        className={cn("rounded-full", buttonVariants({ variant: "primary" }))}
+      >
         Gå til forsiden
-      </Button>
+      </Link>
     </div>
   );
 }

@@ -9,16 +9,16 @@ import { ROUTES } from "../../../utils/routes";
 import {
   Button,
   Chip,
-  Link,
+  cn,
+  EmptyState,
+  linkVariants,
+  Spinner,
   Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
   Tooltip,
+  Typography,
 } from "@heroui/react";
 import { readmeIfy } from "@/components/ReadmeLogo";
+import NextLink from "next/link";
 
 // This is a temporary hack since the pages list isnt indexed in algolia
 const getPageNumber = (url: string) => {
@@ -35,90 +35,113 @@ const SearchTableComponent: FC<InfiniteHitsProvided & StateResultsProvided> = ({
   return (
     <>
       {searchState && searchState.query ? (
-        <Table
-          isStriped
-          aria-label="Search results"
-          classNames={{
-            wrapper: "shadow-none p-0 rounded-sm",
-          }}
-          bottomContent={
-            hasMore && (
+        <Table className="w-full" variant="secondary">
+          <Table.ScrollContainer>
+            <Table.Content aria-label="Søkeresultater">
+              <Table.Header>
+                <Table.Column>Utgave</Table.Column>
+                <Table.Column isRowHeader>Tittel</Table.Column>
+                <Table.Column>Forfatter</Table.Column>
+                <Table.Column className="rounded-e-lg sm:rounded-none">
+                  Layout
+                </Table.Column>
+                {/* <Table.Column className="hidden md:table-cell">
+                  Spalte
+                </Table.Column> */}
+                <Table.Column className="hidden sm:table-cell">
+                  Stikkord
+                </Table.Column>
+              </Table.Header>
+              <Table.Body
+                items={hits}
+                renderEmptyState={() => (
+                  <EmptyState className="flex h-full w-full flex-col items-center justify-center gap-4 text-center">
+                    <span className="text-sm text-muted">No results found</span>
+                  </EmptyState>
+                )}
+              >
+                {(item) => (
+                  <Table.Row key={item.id}>
+                    <Table.Cell>
+                      <NextLink
+                        className={cn(
+                          "text-nowrap text-accent text-sm",
+                          linkVariants().base(),
+                        )}
+                        href={
+                          ROUTES.EDITION.replace(":id", item.edition) +
+                          `#page=${getPageNumber(item.url)}`
+                        }
+                      >
+                        {item.edition}
+                      </NextLink>
+                    </Table.Cell>
+                    <Table.Cell className="font-bold">
+                      {item.type && (
+                        <Typography.Paragraph color="muted" size="xs">
+                          {item.type}
+                        </Typography.Paragraph>
+                      )}
+                      <Typography.Paragraph size="sm">
+                        {readmeIfy(item.title)}
+                      </Typography.Paragraph>
+                    </Table.Cell>
+                    <Table.Cell>{readmeIfy(item.author)}</Table.Cell>
+                    <Table.Cell className="before:rounded-e-lg sm:before:rounded-none">
+                      {readmeIfy(item.layout)}
+                    </Table.Cell>
+                    {/* <Table.Cell className="hidden md:table-cell">
+                      {item.type}
+                      </Table.Cell> */}
+                    <Table.Cell className="hidden sm:table-cell">
+                      <div className="flex gap-[5px] flex-wrap">
+                        {(Array.isArray(item.tags)
+                          ? item.tags
+                          : [item.tags]
+                        ).map(
+                          (tag: string, i: number) =>
+                            tag &&
+                            tag.trim() && (
+                              <Tooltip delay={0} key={i}>
+                                <Tooltip.Trigger>
+                                  <Chip
+                                    color="accent"
+                                    variant="soft"
+                                    className="max-w-[100px]"
+                                  >
+                                    <span className="truncate">
+                                      {readmeIfy(tag)}
+                                    </span>
+                                  </Chip>
+                                </Tooltip.Trigger>
+                                <Tooltip.Content className="bg-accent">
+                                  {readmeIfy(tag)}
+                                </Tooltip.Content>
+                              </Tooltip>
+                            ),
+                        )}
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+          <Table.Footer>
+            {hasMore && (
               <div className="flex w-full justify-center">
-                <Button
-                  variant="solid"
-                  color="primary"
-                  onPress={refineNext}
-                  isLoading={searching}
-                >
-                  Vis mer
+                <Button onPress={refineNext} isPending={searching}>
+                  {searching ? (
+                    <>
+                      <Spinner color="current" /> Laster
+                    </>
+                  ) : (
+                    "Vis mer"
+                  )}
                 </Button>
               </div>
-            )
-          }
-        >
-          <TableHeader>
-            <TableColumn>Utgave</TableColumn>
-            <TableColumn>Tittel</TableColumn>
-            <TableColumn>Forfatter</TableColumn>
-            <TableColumn className="rounded-e-lg sm:rounded-none">
-              Layout
-            </TableColumn>
-            <TableColumn className="hidden md:table-cell">Spalte</TableColumn>
-            <TableColumn className="hidden sm:table-cell">Stikkord</TableColumn>
-          </TableHeader>
-          <TableBody emptyContent="Ingen artikler funnet.">
-            {hits.map((hit, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <Link
-                    className="text-nowrap"
-                    href={
-                      ROUTES.EDITION.replace(":id", hit.edition) +
-                      `#page=${getPageNumber(hit.url)}`
-                    }
-                    size="sm"
-                  >
-                    {hit.edition}
-                  </Link>
-                </TableCell>
-                <TableCell className="font-bold">
-                  {readmeIfy(hit.title)}
-                </TableCell>
-                <TableCell>{readmeIfy(hit.author)}</TableCell>
-                <TableCell className="before:rounded-e-lg sm:before:rounded-none">
-                  {readmeIfy(hit.layout)}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {hit.type}
-                </TableCell>
-                <TableCell className="hidden sm:table-cell">
-                  <div className="flex gap-[5px] flex-wrap">
-                    {(Array.isArray(hit.tags) ? hit.tags : [hit.tags]).map(
-                      (tag: string, i: number) =>
-                        tag &&
-                        tag.trim() && (
-                          <Tooltip
-                            content={readmeIfy(tag)}
-                            delay={500}
-                            color="danger"
-                            key={i}
-                          >
-                            <Chip
-                              size="sm"
-                              variant={"flat"}
-                              color="primary"
-                              className="[&>*]:overflow-hidden [&>*]:max-w-[100px] [&>*]:text-ellipsis"
-                            >
-                              {readmeIfy(tag)}
-                            </Chip>
-                          </Tooltip>
-                        )
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+            )}
+          </Table.Footer>
         </Table>
       ) : null}
     </>
@@ -126,5 +149,5 @@ const SearchTableComponent: FC<InfiniteHitsProvided & StateResultsProvided> = ({
 };
 
 export const SearchTable = connectInfiniteHits(
-  connectStateResults(SearchTableComponent)
+  connectStateResults(SearchTableComponent),
 );

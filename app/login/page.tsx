@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import SignInWithLego from "./_components/SignInWithLego";
 import SignInWithPassword from "./_components/SignInWithPassword";
-import { Divider } from "@heroui/react";
+import { Separator } from "@heroui/react";
 
 export const metadata: Metadata = {
   title: "readme - logg inn",
@@ -13,7 +13,7 @@ export default function Page() {
       <h1 className="text-3xl font-bold text-default-foreground">Logg inn</h1>
       <SignInWithLego />
       <div className="relative my-4 flex items-center w-full">
-        <Divider />
+        <Separator />
         <span className="absolute left-1/2 -translate-x-1/2 bg-background px-3 text-xs uppercase">
           eller
         </span>

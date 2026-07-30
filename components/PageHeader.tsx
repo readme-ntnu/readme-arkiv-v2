@@ -1,7 +1,8 @@
 "use client";
 
 import { ArrowLeft } from "@gravity-ui/icons";
-import { Button, Link } from "@heroui/react";
+import { buttonVariants, cn } from "@heroui/react";
+import Link from "next/link";
 
 interface IProps {
   title: string;
@@ -14,14 +15,15 @@ export default function PageHeader(props: IProps) {
     <div className="flex place-content-between items-center w-full">
       <div className="flex items-center gap-2">
         {props.backButtonRoute && (
-          <Button
-            isIconOnly
-            variant="light"
-            as={Link}
+          <Link
             href={props.backButtonRoute}
+            className={cn(
+              "rounded-full",
+              buttonVariants({ variant: "ghost", isIconOnly: true }),
+            )}
           >
             <ArrowLeft className="h-[28px] w-[28px]" />
-          </Button>
+          </Link>
         )}
         <h1 className="text-3xl font-bold text-default-foreground ">
           {props.title}

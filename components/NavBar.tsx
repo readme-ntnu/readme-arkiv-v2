@@ -6,14 +6,7 @@ import { ROUTES } from "../utils/routes";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../lib/Firebase/firebase";
 import { signOut } from "firebase/auth";
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Link,
-} from "@heroui/react";
+import { Button, Dropdown, Separator, buttonVariants, cn } from "@heroui/react";
 import { ReadmeLogo } from "./ReadmeLogo";
 import {
   Bars,
@@ -23,6 +16,7 @@ import {
   ArrowUpRightFromSquare,
   PersonGear,
 } from "@gravity-ui/icons";
+import Link from "next/link";
 
 export const NavBar: FC = () => {
   const [user, loading] = useAuthState(auth);
@@ -35,74 +29,63 @@ export const NavBar: FC = () => {
         <ReadmeLogo maxWidth={"190px"} />
       </Link>
       <div className="flex gap-2">
-        <Button
-          color="primary"
-          radius="full"
-          className="text-xs hidden md:flex"
-          as={Link}
+        <Link
+          className={cn(
+            "text-xs hidden md:flex rounded-full",
+            buttonVariants({ variant: "primary" }),
+          )}
           href={ROUTES.SEARCH}
-          endContent={<Magnifier />}
         >
           SØK
-        </Button>
+          <Magnifier />
+        </Link>
         <LightSwitch />
-        <Dropdown
-          onOpenChange={setIsOpen}
-          isOpen={isOpen}
-          className={"absolute right-0 translate-x-[20px]"}
-        >
-          <DropdownTrigger>
-            <Button
-              isIconOnly
-              color="default"
-              radius="full"
-              className="text-xs"
-              endContent={isOpen ? <Xmark /> : <Bars />}
-            ></Button>
-          </DropdownTrigger>
-          <DropdownMenu aria-label="Static Actions">
-            <DropdownItem
-              key="search"
-              as={Link}
-              className="text-foreground"
-              href={ROUTES.SEARCH}
-              startContent={<Magnifier />}
-            >
-              Artikkelsøk
-            </DropdownItem>
-            <DropdownItem
-              showDivider={!loading && !!user}
-              key="abakus"
-              as={Link}
-              className="text-foreground"
-              href="https://abakus.no/"
-              startContent={<ArrowUpRightFromSquare />}
-            >
-              Abakus.no
-            </DropdownItem>
-            {!loading && user ? (
-              <>
-                <DropdownItem
-                  key="edition_list"
-                  as={Link}
-                  className="text-foreground"
-                  href={ROUTES.ADMIN}
-                  startContent={<PersonGear />}
-                >
-                  Admin
-                </DropdownItem>
-                <DropdownItem
-                  key="logout"
-                  color="danger"
-                  className="text-danger"
-                  startContent={<ArrowRightFromSquare />}
-                  onPress={() => signOut(auth)}
-                >
-                  Log ut
-                </DropdownItem>
-              </>
-            ) : null}
-          </DropdownMenu>
+        <Dropdown onOpenChange={setIsOpen} isOpen={isOpen}>
+          <Button
+            variant="tertiary"
+            isIconOnly
+            className="text-xs rounded-full"
+          >
+            {isOpen ? <Xmark /> : <Bars />}
+          </Button>
+          <Dropdown.Popover placement={"bottom right"}>
+            <Dropdown.Menu>
+              <Dropdown.Item key="search" className="text-foreground">
+                <Magnifier />
+                <Link href={ROUTES.SEARCH}>Artikkelsøk</Link>
+              </Dropdown.Item>
+              <Dropdown.Item
+                // showDivider={!loading && !!user}
+                key="abakus"
+                className="text-foreground"
+                href="https://abakus.no/"
+              >
+                <ArrowUpRightFromSquare />
+                Abakus.no
+              </Dropdown.Item>
+              {!loading && user ? (
+                <>
+                  <Separator />
+                  <Dropdown.Item
+                    key="edition_list"
+                    className="text-foreground"
+                    href={ROUTES.ADMIN}
+                  >
+                    <PersonGear />
+                    Admin
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    key="logout"
+                    className="text-danger"
+                    onPress={() => signOut(auth)}
+                  >
+                    <ArrowRightFromSquare />
+                    Log ut
+                  </Dropdown.Item>
+                </>
+              ) : null}
+            </Dropdown.Menu>
+          </Dropdown.Popover>
         </Dropdown>
       </div>
     </nav>
