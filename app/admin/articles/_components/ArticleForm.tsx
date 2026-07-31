@@ -9,12 +9,14 @@ import {
   Alert,
   Button,
   ComboBox,
+  Description,
   FieldError,
   Form,
   Input,
   Label,
   ListBox,
   NumberField,
+  Select,
   Spinner,
   TextArea,
   TextField,
@@ -23,6 +25,8 @@ import { Xmark } from "@gravity-ui/icons";
 import React from "react";
 import { ComboBoxStateContext } from "react-aria-components";
 import LabelTooltip from "@/components/TooltipLabel";
+import { TagInput } from "@/components/TagInput";
+import { TagField } from "@/components/TagField";
 
 interface ArticleFormProps {
   doHandleSubmit: ISubmitArticleFunction;
@@ -85,10 +89,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
         'Skriv inn som en liste med tall, separert med komma og mellomrom: "10, 12, 13".',
       )
       .required("Artikkelen må ha sidetall, og de må oppgis på rett form."),
-    tags: Yup.string().matches(
-      new RegExp("^[\\S]+(,\\s{1}[\\S]+)*$"),
-      'Skriv inn som en liste med ord som beskriver artikkelens innhold, separert med komma og mellomrom: "hei, på, deg".',
-    ),
+    tags: Yup.array().of(Yup.string().trim().required()).default([]),
   });
 
   const now = new Date();
@@ -104,7 +105,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
     editionNumber: editionNumber || 1,
     content: content || "",
     pages: pages || "",
-    tags: tags || "",
+    tags: tags || [],
   };
 
   const columnSuggestions = [
@@ -199,8 +200,8 @@ export const ArticleForm: FC<ArticleFormProps> = ({
               <ComboBox
                 allowsCustomValue
                 allowsEmptyCollection
-                value={values.type}
-                onChange={(value) => setFieldValue("type", value)}
+                inputValue={values.type}
+                onInputChange={(value) => setFieldValue("type", value)}
                 onBlur={handleBlur}
                 className="flex-1"
               >
@@ -225,7 +226,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
                 </ComboBox.Popover>
               </ComboBox>
             </div>
-            <div className="flex flex-col md:flex-row gap-[25px] w-full">
+            <div className="flex flex-col sm:flex-row gap-[25px] w-full">
               <NumberField
                 name="editionYear"
                 value={values.editionYear}
@@ -318,37 +319,37 @@ export const ArticleForm: FC<ArticleFormProps> = ({
               <TextArea />
               <FieldError />
             </TextField>
-            <div className="flex flex-col md:flex-row gap-[25px] w-full">
-              <TextField
-                name="pages"
-                value={values.pages}
-                onChange={(value) => setFieldValue("pages", value)}
-                onBlur={handleBlur}
-                isRequired
-                className="flex-1"
-              >
-                <Label>
-                  Sidetall
-                  <LabelTooltip tooltipText='Skriv inn som en liste med tall, separert med komma og mellomrom: "10, 12, 13".' />
-                </Label>
-                <Input />
-                <FieldError />
-              </TextField>
-              <TextField
-                name="tags"
-                value={values.tags}
-                onChange={(value) => setFieldValue("tags", value)}
-                onBlur={handleBlur}
-                className="flex-1"
-              >
-                <Label>
-                  Tags
-                  <LabelTooltip tooltipText='Skriv inn som en liste med ord som beskriver artikkelens innhold, separert med komma og mellomrom: "hei, på, deg".' />
-                </Label>
-                <Input />
-                <FieldError />
-              </TextField>
-            </div>
+            <TextField
+              name="pages"
+              value={values.pages}
+              onChange={(value) => setFieldValue("pages", value)}
+              onBlur={handleBlur}
+              isRequired
+              className="w-full"
+            >
+              <Label>
+                Sidetall
+                <LabelTooltip tooltipText='Skriv inn som en liste med tall, separert med komma og mellomrom: "10, 12, 13".' />
+              </Label>
+              <Input />
+              <FieldError />
+            </TextField>
+            <TagField
+              name="tags"
+              className="w-full"
+              value={values.tags}
+              onChange={(values) => setFieldValue("tags", values)}
+              onBlur={() => {
+                setFieldTouched("tags", true);
+              }}
+            >
+              <Label>
+                Tags
+                <LabelTooltip tooltipText="Legg til tags ved å skrive inn én tag om gangen og trykke Enter." />
+              </Label>
+              <TagInput className="w-full" placeholder="Legg til tag" />
+              <FieldError />
+            </TagField>
             <Button
               type="submit"
               variant="primary"

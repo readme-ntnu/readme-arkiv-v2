@@ -8,7 +8,7 @@ export default function LabelTooltip({ tooltipText }: { tooltipText: string }) {
         <CircleQuestion width={16} height={16} />
       </Tooltip.Trigger>
       <Tooltip.Content>
-        <p>{tooltipText}</p>
+        <p className="break-normal">{tooltipText}</p>
       </Tooltip.Content>
     </Tooltip>
   );
