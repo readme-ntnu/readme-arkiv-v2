@@ -38,7 +38,7 @@ export type ISubmitArticleFunction = (
       success?: boolean;
       error?: boolean;
     }) => void;
-  }
+  },
 ) => void;
 
 export type ISubmitEditionFunction = (
@@ -54,7 +54,7 @@ export type ISubmitEditionFunction = (
       error?: boolean;
       progress?: number;
     }) => void;
-  }
+  },
 ) => void;
 
 export interface INewEditionData {
@@ -73,7 +73,7 @@ export interface IEditArticle {
   layout: string;
   pages: string;
   photo: string;
-  tags: string;
+  tags: string[];
   type: string;
   url: string;
   id?: string;

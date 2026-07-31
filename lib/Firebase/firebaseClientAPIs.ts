@@ -19,7 +19,7 @@ export const deleteArticle = async (id: string) => {
 
 export const addEdition = async (
   edition: INewEditionData,
-  onProgressUpdate?: (progress: number) => void
+  onProgressUpdate?: (progress: number) => void,
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     const path = `pdf/${edition.editionYear}/${edition.editionFile.name}`;
@@ -34,7 +34,7 @@ export const addEdition = async (
     const uploadTask = uploadBytesResumable(
       pdfRef,
       edition.editionFile,
-      metadata
+      metadata,
     );
 
     uploadTask.on(
@@ -50,13 +50,13 @@ export const addEdition = async (
       () => {
         const downloadURL = getPDFDownloadURL(
           `${edition.editionYear}`,
-          edition.editionFile.name
+          edition.editionFile.name,
         );
         console.log(`File available at ${downloadURL}`);
         const editionName = edition.editionFile.name.replace(".pdf", "");
         updateArticlePDFURL(editionName, downloadURL);
         resolve();
-      }
+      },
     );
   });
 };
@@ -90,13 +90,12 @@ export const deleteEdition = async (editionString: string) => {
 export const addNewArticle = async (
   valuesToPost: IEditArticle,
   onSuccess: () => void,
-  onError: () => void
+  onError: () => void,
 ) => {
   // Making a true copy to avoid pass-by-reference issues
   const article: Partial<IArticle> = {
     ...valuesToPost,
     pages: valuesToPost.pages.split(",").map((v) => parseInt(v)),
-    tags: valuesToPost.tags.split(",").map((v) => v.trim()),
     edition: `${valuesToPost.editionYear}-0${valuesToPost.editionNumber}`,
   };
 
@@ -111,7 +110,7 @@ export const addNewArticle = async (
   } catch (error) {
     console.error(
       "Something when wrong during edition upload, failed with error: ",
-      error
+      error,
     );
     if (onError) {
       onError();
@@ -130,12 +129,11 @@ export const updateArticle = async (
   valuesToPost: IEditArticle,
   id: string,
   onSuccess?: () => void,
-  onError?: () => void
+  onError?: () => void,
 ) => {
   const article: IArticle = {
     ...valuesToPost,
     pages: valuesToPost.pages.split(",").map((v) => parseInt(v)),
-    tags: valuesToPost.tags.split(",").map((v) => v.trim()),
     edition: `${valuesToPost.editionYear}-0${valuesToPost.editionNumber}`,
     id: id,
   };
@@ -151,7 +149,7 @@ export const updateArticle = async (
   } catch (error) {
     console.error(
       "Something when wrong during edition upload, failed with error: ",
-      error
+      error,
     );
     if (onError) {
       onError();
@@ -170,7 +168,7 @@ const getArticlePDFURL = (article: IArticle) => {
 
 const updateArticlePDFURL = async (editionName: unknown, newURL: string) => {
   const articles = await getDocs(
-    query(collection(db, "articles"), where("edition", "==", editionName))
+    query(collection(db, "articles"), where("edition", "==", editionName)),
   );
   if (articles && !articles.empty) {
     articles.forEach(async (docSnap) => {

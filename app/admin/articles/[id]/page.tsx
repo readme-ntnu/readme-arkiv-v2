@@ -36,7 +36,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         editionYear: Number(editionYear),
         editionNumber: Number(editionNumber),
         pages: article.pages.join(", "),
-        tags: article.tags.join(", "),
       };
       if (isSubscribed) {
         setArticle(editArticle);
