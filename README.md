@@ -26,8 +26,7 @@ Så må du installere firebase-tools:
 npm install -g firebase-tools
 ```
 
-Du trenger også en fil med lokale miljøvariabler, som lar deg kjøre prosjektet. Spør [Øyvind](https://github.com/Oyveloper) eller [Andreas](https://github.com/AndreasHaaversen), så sender de deg en fil.
-NB! Denne fila, som _må_ hete `.env.local`, _*må*_ holdes hemmelig, da den inneholder sensitiv info.
+Du trenger også to filer (`.env.local` og `functions/.env.local`) med miljøvariabler. Spør [Viljan](https://github.com/viljanvr) for å få de. **NB! Disse filene må holdes hemmelig, da de inneholder sensitiv info!**
 
 NB! For å kjøre firebase-emulatorer trenger du også Java installert.
 

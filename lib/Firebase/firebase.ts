@@ -19,10 +19,8 @@ const functions = getFunctions(app);
 
 const db = getFirestore(app);
 
-if (
-  process.env.VERCEL_ENV !== "production" &&
-  process.env.VERCEL_ENV !== "preview"
-) {
+if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true") {
+  console.log("Firebase client SDK is using emulators.");
   connectStorageEmulator(storage, "localhost", 9199);
   connectAuthEmulator(auth, "http://localhost:9099");
   connectFirestoreEmulator(db, "localhost", 8080);
