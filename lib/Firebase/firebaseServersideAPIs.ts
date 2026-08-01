@@ -5,7 +5,7 @@ import { db, storage } from "./firebaseAdmin";
 
 // Edition list param allows us to opt out of filtering by listing
 export async function getEditions(
-  filterListingEditions: boolean = false
+  filterListingEditions: boolean = false,
 ): Promise<IEditionData[]> {
   const pdfRefs = await storage.bucket().getFiles({ prefix: "pdf/" });
   const showListing = await (
@@ -41,14 +41,14 @@ export async function getEditions(
           imageUrl: getDownloadURL(pdfRef.bucket.name, imagePath),
         },
       ]);
-    })
+    }),
   );
 
   const finalData: IEditionData[] = Array.from(yearEditionMap.entries()).map(
     ([year, editions]) => ({
       year: parseInt(year),
       editions: editions.sort((a, b) => b.edition.localeCompare(a.edition)),
-    })
+    }),
   );
 
   return finalData.sort((a, b) => b.year - a.year);
@@ -56,7 +56,7 @@ export async function getEditions(
 
 const getDownloadURL = (bucketName: string, fullPath: string) =>
   `${
-    process.env.NODE_ENV === "production"
-      ? "https://storage.googleapis.com"
-      : "http://localhost:9199"
+    process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true"
+      ? "http://localhost:9199"
+      : "https://storage.googleapis.com"
   }/${bucketName}/${fullPath}`;
