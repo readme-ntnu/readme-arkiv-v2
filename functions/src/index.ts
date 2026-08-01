@@ -21,8 +21,7 @@ admin.initializeApp();
 
 const THUMB_MAX_WIDTH = 620;
 
-const VERCEL_REBUILD_URL =
-  "https://api.vercel.com/v1/integrations/deploy/prj_EMutmNh2b9jV8LM7p843xbrKastq/yZPSj6goDw";
+const VERCEL_REBUILD_URL = process.env.VERCEL_REBUILD_URL || "";
 
 exports.handlePDFUploadv2 = onObjectFinalized(
   {
@@ -131,10 +130,7 @@ exports.handleSettingsChangev2 = onDocumentWritten(
   "/settings/{docID}",
   async () => {
     if (process.env.NODE_ENV === "production") {
-      await fetch(
-        "https://api.vercel.com/v1/integrations/deploy/prj_EMutmNh2b9jV8LM7p843xbrKastq/YmXMYVqB6P",
-        { method: "POST" },
-      );
+      await fetch(VERCEL_REBUILD_URL, { method: "POST" });
       console.log("Pinging Vercel for rebuild.");
     } else {
       console.log(
