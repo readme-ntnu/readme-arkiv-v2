@@ -23,7 +23,7 @@ const THUMB_MAX_WIDTH = 620;
 
 const VERCEL_REBUILD_URL = process.env.VERCEL_REBUILD_URL;
 
-const vercel_rebuild = async () => {
+const vercelRebuild = async () => {
   if (process.env.NODE_ENV === "production") {
     if (VERCEL_REBUILD_URL == undefined) {
       console.error(
@@ -109,7 +109,7 @@ exports.handlePDFUploadv2 = onObjectFinalized(
       thumbnailUploadStream.on("finish", resolve).on("error", reject),
     );
 
-    await vercel_rebuild();
+    await vercelRebuild();
 
     return fs.remove(workingDir);
   },
@@ -123,13 +123,13 @@ exports.handlePdfDeletev2 = onObjectDeleted(
       return console.log("Object is not a pdf.");
     }
 
-    await vercel_rebuild();
+    await vercelRebuild();
   },
 );
 
 exports.handleSettingsChangev2 = onDocumentWritten(
   "/settings/{docID}",
   async () => {
-    await vercel_rebuild();
+    await vercelRebuild();
   },
 );
