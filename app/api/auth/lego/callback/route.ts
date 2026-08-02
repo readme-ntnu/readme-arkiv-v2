@@ -3,8 +3,9 @@ import { auth } from "lib/Firebase/firebaseAdmin";
 import { API_ROUTES, ROUTES } from "utils/routes";
 import getBaseUrl from "utils/baseUrl";
 import {
-  clearOAuthState,
+  clearOAuthCookies,
   isFirebaseAuthError,
+  LEGO_OAUTH_PKCE_COOKIE,
   LEGO_OAUTH_STATE_COOKIE,
 } from "../../../../../utils/oauth";
 
@@ -13,16 +14,25 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const returnedState = searchParams.get("state");
   const storedState = request.cookies.get(LEGO_OAUTH_STATE_COOKIE)?.value;
+  const codeVerifier = request.cookies.get(LEGO_OAUTH_PKCE_COOKIE)?.value;
 
   if (!code) {
     const response = new NextResponse("Missing code", { status: 400 });
-    clearOAuthState(response);
+    clearOAuthCookies(response);
     return response;
   }
 
-  if (!returnedState || !storedState || returnedState !== storedState) {
-    const response = new NextResponse("Invalid OAuth state", { status: 400 });
-    clearOAuthState(response);
+  if (
+    !returnedState ||
+    !storedState ||
+    returnedState !== storedState ||
+    !codeVerifier
+  ) {
+    const response = new NextResponse("Invalid OAuth transaction", {
+      status: 400,
+    });
+
+    clearOAuthCookies(response);
     return response;
   }
 
@@ -38,6 +48,7 @@ export async function GET(request: NextRequest) {
         client_secret: process.env.LEGO_OAUTH_CLIENT_SECRET!,
         redirect_uri: getBaseUrl() + API_ROUTES.LEGO_CALLBACK,
         code,
+        code_verifier: codeVerifier,
       }),
     },
   );
@@ -49,7 +60,7 @@ export async function GET(request: NextRequest) {
         status: tokenRes.status,
       },
     );
-    clearOAuthState(response);
+    clearOAuthCookies(response);
     return response;
   }
 
@@ -74,7 +85,7 @@ export async function GET(request: NextRequest) {
         status: userRes.status,
       },
     );
-    clearOAuthState(response);
+    clearOAuthCookies(response);
     return response;
   }
 
@@ -89,7 +100,7 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(
       `${getBaseUrl()}${ROUTES.LOGIN_ERROR}?message=${encodeURIComponent("Man må være medlem av readme for å få tilgang")}`,
     );
-    clearOAuthState(response);
+    clearOAuthCookies(response);
     return response;
   }
 
@@ -134,6 +145,6 @@ export async function GET(request: NextRequest) {
   const response = NextResponse.redirect(
     `${getBaseUrl()}${ROUTES.LOGIN_COMPLETE}?token=${firebaseToken}`,
   );
-  clearOAuthState(response);
+  clearOAuthCookies(response);
   return response;
 }
