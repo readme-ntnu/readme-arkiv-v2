@@ -1,14 +1,29 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "lib/Firebase/firebaseAdmin";
 import { API_ROUTES, ROUTES } from "utils/routes";
 import getBaseUrl from "utils/baseUrl";
+import {
+  clearOAuthState,
+  isFirebaseAuthError,
+  LEGO_OAUTH_STATE_COOKIE,
+} from "../../../../../utils/oauth";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
+  const returnedState = searchParams.get("state");
+  const storedState = request.cookies.get(LEGO_OAUTH_STATE_COOKIE)?.value;
 
   if (!code) {
-    return new NextResponse("Missing code", { status: 400 });
+    const response = new NextResponse("Missing code", { status: 400 });
+    clearOAuthState(response);
+    return response;
+  }
+
+  if (!returnedState || !storedState || returnedState !== storedState) {
+    const response = new NextResponse("Invalid OAuth state", { status: 400 });
+    clearOAuthState(response);
+    return response;
   }
 
   // 1. Exchange code → access token
@@ -28,9 +43,14 @@ export async function GET(request: Request) {
   );
 
   if (!tokenRes.ok) {
-    return new NextResponse(`Token exchange failed: ${await tokenRes.text()}`, {
-      status: tokenRes.status,
-    });
+    const response = new NextResponse(
+      `Token exchange failed: ${await tokenRes.text()}`,
+      {
+        status: tokenRes.status,
+      },
+    );
+    clearOAuthState(response);
+    return response;
   }
 
   const tokenData = await tokenRes.json();
@@ -48,9 +68,14 @@ export async function GET(request: Request) {
   );
 
   if (!userRes.ok) {
-    return new NextResponse(`User fetch failed: ${await userRes.text()}`, {
-      status: userRes.status,
-    });
+    const response = new NextResponse(
+      `User fetch failed: ${await userRes.text()}`,
+      {
+        status: userRes.status,
+      },
+    );
+    clearOAuthState(response);
+    return response;
   }
 
   const legoUser = await userRes.json();
@@ -61,9 +86,11 @@ export async function GET(request: Request) {
   );
 
   if (!readmeMembership) {
-    return NextResponse.redirect(
+    const response = NextResponse.redirect(
       `${getBaseUrl()}${ROUTES.LOGIN_ERROR}?message=${encodeURIComponent("Man må være medlem av readme for å få tilgang")}`,
     );
+    clearOAuthState(response);
+    return response;
   }
 
   const uid = `lego:${legoUser.id}`;
@@ -83,13 +110,17 @@ export async function GET(request: Request) {
         photoURL: legoUser.profilePicture,
       });
     }
-  } catch {
-    await auth.createUser({
-      uid,
-      email: legoUser.email,
-      displayName: legoUser.fullName,
-      photoURL: legoUser.profilePicture,
-    });
+  } catch (error: unknown) {
+    if (isFirebaseAuthError(error) && error.code === "auth/user-not-found") {
+      await auth.createUser({
+        uid,
+        email: legoUser.email,
+        displayName: legoUser.fullName,
+        photoURL: legoUser.profilePicture,
+      });
+    } else {
+      throw error;
+    }
   }
 
   // 5. Create Firebase custom token
@@ -100,7 +131,9 @@ export async function GET(request: Request) {
   });
 
   // 4. Redirect back to app
-  return NextResponse.redirect(
+  const response = NextResponse.redirect(
     `${getBaseUrl()}${ROUTES.LOGIN_COMPLETE}?token=${firebaseToken}`,
   );
+  clearOAuthState(response);
+  return response;
 }
