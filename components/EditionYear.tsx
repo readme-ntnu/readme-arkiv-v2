@@ -2,19 +2,25 @@ import Image from "next/image";
 import { FC, useMemo } from "react";
 import { IEditionData } from "../lib/types";
 import { ROUTES } from "../utils/routes";
+import { Chip, Typography } from "@heroui/react";
 
 export const EditionYear: FC<{ data: IEditionData }> = ({ data }) => {
   return (
     <div className="grid grid-cols-[repeat(auto-fit,200px)] gap-[40px] max-w-[calc(3*200px+2*40px)] w-full justify-center not-last:mb-10">
-      <h2 className="text-3xl text-default-foreground font-bold col-span-full mb-[-20px]">
+      <Chip
+        variant="tertiary"
+        size="lg"
+        className="text-lg text-muted font-medium col-span-full mb-[-20px] border-1 border-separator transition-transform duration-150
+  hover:-translate-y-0.5 font-[OCRAExtended]"
+      >
         {data.year}
-      </h2>
+      </Chip>
       {data.editions.map((edition) => (
         <a
           key={`${data.year}-${edition.edition}`}
           href={ROUTES.EDITION.replace(
             ":id",
-            `${data.year}-${edition.edition}`
+            `${data.year}-${edition.edition}`,
           )}
           target="_blank"
           rel="noopener noreferrer"
