@@ -50,7 +50,7 @@ NB! Dersom du gjør endringer i `functions/` underveis må du kompilere TypeScri
 
 Du kan åpne admin-siden på [http://localhost:3000/admin](http://localhost:3000/admin).
 
-Det finnes 3 test brukere i Firebase-emulatoren med forskjellig rettighetsnivårer:
+Det finnes 3 test brukere i Firebase-emulatoren med forskjellig rettighetsnivåer:
 
 - `user1@readme.no` med full admin-rettigheter (tilsvarende det redaktør og nestleder har)
 - `user2@readme.no` med rettighetene til et vanlig readme-medlem

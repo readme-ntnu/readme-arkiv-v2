@@ -21,7 +21,31 @@ admin.initializeApp();
 
 const THUMB_MAX_WIDTH = 620;
 
-const VERCEL_REBUILD_URL = process.env.VERCEL_REBUILD_URL || "";
+const VERCEL_REBUILD_URL = process.env.VERCEL_REBUILD_URL;
+
+const vercel_rebuild = async () => {
+  if (process.env.NODE_ENV === "production") {
+    if (VERCEL_REBUILD_URL == undefined) {
+      console.error(
+        "VERCEL_REBUILD_URL is not set. Vercel rebuild pings will be skipped.",
+      );
+      return;
+    }
+
+    console.log("Pinging Vercel for rebuild.");
+    await fetch(VERCEL_REBUILD_URL, { method: "POST" })
+      .then((response) => {
+        console.log("Got response from Vercel for rebuild", response);
+      })
+      .catch((err) => {
+        console.error("Got error when trying to ping Vercel for rebuild", err);
+      });
+  } else {
+    console.log(
+      `In env "${process.env.NODE_ENV}". Vercel rebuild pings will be skipped.`,
+    );
+  }
+};
 
 exports.handlePDFUploadv2 = onObjectFinalized(
   {
@@ -85,23 +109,7 @@ exports.handlePDFUploadv2 = onObjectFinalized(
       thumbnailUploadStream.on("finish", resolve).on("error", reject),
     );
 
-    if (process.env.NODE_ENV === "production") {
-      console.log("Pinging Vercel for rebuild.");
-      await fetch(VERCEL_REBUILD_URL, { method: "POST" })
-        .then((response) => {
-          console.log("Got response from Vercel for rebuild", response);
-        })
-        .catch((err) => {
-          console.error(
-            "Got error when trying to ping Vercel for rebuild",
-            err,
-          );
-        });
-    } else {
-      console.log(
-        `In env ${process.env.NODE_ENV}, not pinging Vercel for rebuild.`,
-      );
-    }
+    await vercel_rebuild();
 
     return fs.remove(workingDir);
   },
@@ -115,27 +123,13 @@ exports.handlePdfDeletev2 = onObjectDeleted(
       return console.log("Object is not a pdf.");
     }
 
-    if (process.env.NODE_ENV === "production") {
-      await fetch(VERCEL_REBUILD_URL, { method: "POST" });
-      console.log("Pinging Vercel for rebuild.");
-    } else {
-      console.log(
-        `In env ${process.env.NODE_ENV}, not pinging Vercel for rebuild.`,
-      );
-    }
+    await vercel_rebuild();
   },
 );
 
 exports.handleSettingsChangev2 = onDocumentWritten(
   "/settings/{docID}",
   async () => {
-    if (process.env.NODE_ENV === "production") {
-      await fetch(VERCEL_REBUILD_URL, { method: "POST" });
-      console.log("Pinging Vercel for rebuild.");
-    } else {
-      console.log(
-        `In env ${process.env.NODE_ENV}, not pinging Vercel for rebuild.`,
-      );
-    }
+    await vercel_rebuild();
   },
 );

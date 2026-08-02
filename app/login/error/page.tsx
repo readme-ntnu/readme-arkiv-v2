@@ -7,7 +7,7 @@ import { ROUTES } from "utils/routes";
 import { useSearchParams } from "next/navigation";
 import { readmeIfy } from "@/components/ReadmeLogo";
 import Link from "next/link";
-import { buttonVariants, cn } from "@heroui/styles";
+import { buttonVariants, cn } from "@heroui/react";
 
 function ErrorContent() {
   const searchParams = useSearchParams();
