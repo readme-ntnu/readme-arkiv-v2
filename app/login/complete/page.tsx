@@ -14,14 +14,21 @@ function CompleteLoginContent() {
   useEffect(() => {
     const token = searchParams.get("token");
 
-    if (!token) return;
+    if (!token) {
+      router.replace(
+        `${ROUTES.LOGIN_ERROR}?message=${encodeURIComponent("Mangler innloggingstoken. Prøv å logge inn på nytt.")}`,
+      );
+      return;
+    }
 
     signInWithCustomToken(auth, token)
       .then(() => {
         router.replace(ROUTES.ADMIN);
       })
       .catch((error) => {
-        router.replace(ROUTES.LOGIN_ERROR);
+        router.replace(
+          `${ROUTES.LOGIN_ERROR}?message=${encodeURIComponent(error?.message ?? "Kunne ikke fullføre innlogging.")}`,
+        );
         console.log(error);
       });
   }, [router, searchParams]);

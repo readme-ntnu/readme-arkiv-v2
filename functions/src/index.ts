@@ -1,10 +1,10 @@
 import * as admin from "firebase-admin";
+import { PDFiumLibrary } from "@hyzyla/pdfium";
 
 import * as path from "path";
 import sharp from "sharp";
 import * as os from "os";
 import * as fs from "fs-extra";
-import pdf2jpg from "pdf2jpg";
 import fetch from "node-fetch";
 import {
   onObjectFinalized,
@@ -22,8 +22,9 @@ admin.initializeApp();
 const THUMB_MAX_WIDTH = 620;
 
 const VERCEL_REBUILD_URL = process.env.VERCEL_REBUILD_URL;
+const pdfiumLibrary = PDFiumLibrary.init();
 
-const vercel_rebuild = async () => {
+const vercelRebuild = async () => {
   if (process.env.NODE_ENV === "production") {
     if (VERCEL_REBUILD_URL == undefined) {
       console.error(
@@ -52,6 +53,7 @@ exports.handlePDFUploadv2 = onObjectFinalized(
     region: "europe-west1",
     timeoutSeconds: 180,
     memory: "512MiB",
+    secrets: ["VERCEL_REBUILD_URL"],
   },
   async (object) => {
     const fileBucket = object.data.bucket; // The Storage bucket that contains the file.
@@ -66,9 +68,6 @@ exports.handlePDFUploadv2 = onObjectFinalized(
     const bucket = admin.storage().bucket(fileBucket);
     const workingDir = path.join(os.tmpdir(), "thumbs");
     const tempFilePath = path.join(workingDir, fileName);
-    const tempPNGFilePath = path
-      .join(workingDir, fileName)
-      .replace(".pdf", ".png");
 
     await fs.ensureDir(workingDir);
 
@@ -79,10 +78,29 @@ exports.handlePDFUploadv2 = onObjectFinalized(
 
     await fs.ensureFile(tempFilePath);
 
-    await pdf2jpg(tempFilePath, { page: 1 }).then(
-      (buffer: string | NodeJS.ArrayBufferView) =>
-        fs.writeFileSync(tempPNGFilePath, buffer),
-    );
+    const library = await pdfiumLibrary;
+    const pdfBuffer = await fs.readFile(tempFilePath);
+    const document = await library.loadDocument(Uint8Array.from(pdfBuffer));
+    let thumbnail: Uint8Array;
+
+    try {
+      const firstPage = document.getPage(0);
+      const renderedPage = await firstPage.render({
+        scale: 2,
+        render: async ({ data, width, height }) =>
+          Uint8Array.from(
+            await sharp(data, {
+              raw: { width, height, channels: 4 },
+            })
+              .resize(THUMB_MAX_WIDTH)
+              .jpeg()
+              .toBuffer(),
+          ),
+      });
+      thumbnail = renderedPage.data;
+    } finally {
+      document.destroy();
+    }
 
     const metadata = {
       contentType: "image/jpeg",
@@ -92,44 +110,33 @@ exports.handlePDFUploadv2 = onObjectFinalized(
       .replace(".pdf", ".jpg")
       .replace("pdf", "images");
 
-    const thumbnailUploadStream = bucket
-      .file(thumbFilePath)
-      .createWriteStream({ metadata });
+    await bucket.file(thumbFilePath).save(Buffer.from(thumbnail), { metadata });
 
-    // Create Sharp pipeline for resizing the image and use pipe to read from bucket read stream
-    const pipeline = sharp();
-    pipeline
-      .resize(THUMB_MAX_WIDTH)
-      .toFormat("jpeg")
-      .pipe(thumbnailUploadStream);
-
-    fs.createReadStream(tempPNGFilePath).pipe(pipeline);
-
-    await new Promise((resolve, reject) =>
-      thumbnailUploadStream.on("finish", resolve).on("error", reject),
-    );
-
-    await vercel_rebuild();
+    await vercelRebuild();
 
     return fs.remove(workingDir);
   },
 );
 
 exports.handlePdfDeletev2 = onObjectDeleted(
-  { region: "europe-west1" },
+  { region: "europe-west1", secrets: ["VERCEL_REBUILD_URL"] },
   async (object) => {
     const filePath = object.data.name as string;
     if (!filePath.match(/pdf\/\d{4}\/.+\.pdf/g)) {
       return console.log("Object is not a pdf.");
     }
 
-    await vercel_rebuild();
+    await vercelRebuild();
   },
 );
 
 exports.handleSettingsChangev2 = onDocumentWritten(
-  "/settings/{docID}",
+  {
+    document: "/settings/{docID}",
+    region: "europe-west1",
+    secrets: ["VERCEL_REBUILD_URL"],
+  },
   async () => {
-    await vercel_rebuild();
+    await vercelRebuild();
   },
 );

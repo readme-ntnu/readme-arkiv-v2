@@ -34,9 +34,9 @@ const nextConfig = {
 };
 
 const editionURLPattern = `${
-  process.env.NODE_ENV === "production"
-    ? "https://storage.googleapis.com"
-    : "http://127.0.0.1:9199"
+  process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true"
+    ? "http://127.0.0.1:9199"
+    : "https://storage.googleapis.com"
 }/readme-arkiv.appspot.com/pdf/:year/:year-:no.pdf`;
 
 module.exports = nextConfig;

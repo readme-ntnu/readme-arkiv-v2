@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { API_ROUTES } from "./routes";
 import { createHash, randomBytes } from "crypto";
+import getBaseUrl from "./baseUrl";
 
 export const LEGO_OAUTH_STATE_COOKIE = "lego_oauth_state";
 export const LEGO_OAUTH_PKCE_COOKIE = "lego_oauth_pkce";
@@ -8,7 +9,7 @@ export const LEGO_OAUTH_PKCE_COOKIE = "lego_oauth_pkce";
 export const oauthCookieOptions = {
   httpOnly: true,
   sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
+  secure: getBaseUrl() !== "http://localhost:3000",
   path: API_ROUTES.LEGO_CALLBACK,
 };
 

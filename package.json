@@ -8,6 +8,9 @@
     "emulators": "yarn --cwd ./functions build && firebase emulators:start --import=./firebase-fixtures",
     "lint": "eslint ."
   },
+  "engines": {
+    "node": "24"
+  },
   "dependencies": {
     "@heroui/react": "^3.2.2",
     "@heroui/styles": "^3.2.2",
