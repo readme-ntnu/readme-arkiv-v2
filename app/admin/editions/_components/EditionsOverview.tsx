@@ -47,7 +47,7 @@ const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
         overlayState.close();
         toast.danger(
           <>
-            Kunne ikke slette utgave <strong>{edition}</strong>! Kun redaktør,
+            Kunne ikke slette <strong>utgave {edition}</strong>! Kun redaktør,
             nestleder og webansvarlig har tilgang til å slette utgaver. Ta
             kontakt med webansvarlig dersom du mener noe er feil.
           </>,

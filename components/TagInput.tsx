@@ -1,5 +1,5 @@
 import { Xmark } from "@gravity-ui/icons";
-import { Label, Chip, InputGroup, TextField, cn } from "@heroui/react";
+import { Chip, InputGroup, cn } from "@heroui/react";
 import { useState } from "react";
 import { useTagFieldContext } from "./TagField";
 

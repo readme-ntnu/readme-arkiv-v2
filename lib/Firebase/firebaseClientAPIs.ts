@@ -193,9 +193,9 @@ export const getPageNumber = (article: IArticle) => {
 
 const getPDFDownloadURL = (year: string, name: string) => {
   const root =
-    process.env.NODE_ENV === "production"
-      ? "https://storage.googleapis.com"
-      : "http://localhost:9199";
+    process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true"
+      ? "http://localhost:9199"
+      : "https://storage.googleapis.com";
   let url = `${root}/${ref(storage).bucket}/pdf/${year}/${name}`;
   if (!url.endsWith(".pdf")) {
     url += ".pdf";

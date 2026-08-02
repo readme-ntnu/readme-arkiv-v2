@@ -4,7 +4,7 @@ import { cn, linkVariants } from "@heroui/react";
 import Link from "next/link";
 import { ROUTES } from "utils/routes";
 
-export default function SignInWithLego() {
+export default function SignInWithPassword() {
   return (
     <Link
       className={cn(

@@ -34,11 +34,7 @@ export const FileInput: FC<FileInputProps> = ({
           {label}
         </Label>
       )}
-      <div
-      // className={`w-full h-[150px]  ${
-      //   error ? "bg-danger-50" : "bg-default-100"
-      // } rounded-medium ${isDisabled && "opacity-disabled"}`}
-      >
+      <div>
         {!value ? (
           <>
             <label

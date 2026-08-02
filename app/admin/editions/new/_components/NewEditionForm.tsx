@@ -174,7 +174,6 @@ const NewEditionForm: NextPage = () => {
             <FileInput
               value={values.editionFile}
               onChange={(file) => {
-                console.log(file);
                 setFieldTouched("editionFile", true);
                 setFieldValue("editionFile", file);
               }}
