@@ -25,7 +25,7 @@ export const NavBar: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="py-5 px-5 md:px-10 flex justify-between items-center bg-background">
+    <nav className="py-5 px-5 md:px-10 flex justify-between items-center bg-background gap-5">
       <Link href={ROUTES.HOME}>
         <ReadmeLogo maxWidth={"190px"} />
       </Link>
