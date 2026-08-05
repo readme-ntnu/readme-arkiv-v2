@@ -1,4 +1,10 @@
-import { Button, ErrorMessage, Label } from "@heroui/react";
+import {
+  Button,
+  CloseButton,
+  Description,
+  ErrorMessage,
+  Label,
+} from "@heroui/react";
 import { FC } from "react";
 import { Xmark, File, ArrowUpFromSquare } from "@gravity-ui/icons";
 
@@ -24,7 +30,7 @@ export const FileInput: FC<FileInputProps> = ({
   acceptFormat,
 }) => {
   return (
-    <div className={`flex flex-col w-full gap-[5px]`}>
+    <div className={`flex flex-col w-full gap-[5px] min-height-[350px]`}>
       {label && (
         <Label
           isRequired={isRequired}
@@ -39,9 +45,7 @@ export const FileInput: FC<FileInputProps> = ({
           <>
             <label
               htmlFor="dropzone-file"
-              className={
-                "w-full h-full flex flex-col items-center justify-center input-group p-4"
-              }
+              className={"w-full h-full flex gap-4 input-group p-4"}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 e.preventDefault();
@@ -53,9 +57,11 @@ export const FileInput: FC<FileInputProps> = ({
               data-invalid={error}
               data-disabled={isDisabled}
             >
-              <ArrowUpFromSquare height={20} width={20} className="mb-2" />
-              <span className="font-semibold">Trykk for å laste opp</span>
-              <span>eller dra og slipp</span>
+              <ArrowUpFromSquare height={16} width={16} className="m-1" />
+              <span className="flex flex-col">
+                <span className="font-semibold">Last opp fil</span>
+                <Description>Trykk eller dra og slipp</Description>
+              </span>
             </label>
             <input
               name="editionFile"
@@ -70,24 +76,20 @@ export const FileInput: FC<FileInputProps> = ({
             />
           </>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center input-group p-4">
-            <File height={20} width={20} className="mb-2" />
-            <span className="flex items-center gap-[5px]">
-              <span className="truncate max-w-[220px] text-default-foreground">
-                {value.name}
-              </span>
-              <Button
-                isIconOnly
-                variant="ghost"
-                className="rounded-full"
-                onPress={() => onChange(undefined)}
-                isDisabled={isDisabled}
-                size="sm"
-                aria-label="Fjern fil"
-              >
-                <Xmark />
-              </Button>
+          <div className="w-full h-full flex gap-4 input-group p-4">
+            <File height={16} width={16} className="m-1" />
+            <span className="flex flex-col flex-grow">
+              <span className="font-semibold">{value.name}</span>
+              <Description>{(value.size / 1000000).toFixed(1)} Mb</Description>
             </span>
+            <CloseButton
+              className="rounded-full"
+              onPress={() => onChange(undefined)}
+              isDisabled={isDisabled}
+              aria-label="Fjern fil"
+            >
+              <Xmark />
+            </CloseButton>
           </div>
         )}
       </div>

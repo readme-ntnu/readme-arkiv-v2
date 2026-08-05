@@ -188,6 +188,19 @@ const NewEditionForm: NextPage = () => {
               acceptFormat=".pdf"
               isRequired
             />
+            {values.editionFile && values.editionFile.size > 40000000 && (
+              <Alert status="warning" className="rounded-xl">
+                <Alert.Indicator />
+                <Alert.Content>
+                  <Alert.Title>Stor fil valgt!</Alert.Title>
+                  <Alert.Description className="text-xs">
+                    For best ytelse anbefales en filstørrelse på 10–30 MB.
+                    Større filer kan gi økte kostnader og gjøre nettsiden
+                    tregere.
+                  </Alert.Description>
+                </Alert.Content>
+              </Alert>
+            )}
             <Checkbox
               name="listingslop"
               onChange={(value) => setFieldValue("listingslop", value)}
