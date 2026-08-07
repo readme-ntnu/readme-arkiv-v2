@@ -72,38 +72,66 @@ export const NavBar: FC = () => {
                 </div>
               </div>
             ) : null}
-            <Dropdown.Menu>
-              <Dropdown.Item key="search">
-                <Link
-                  href={ROUTES.SEARCH}
-                  className="text-foreground flex w-full items-center justify-between gap-2"
-                >
-                  Artikkelsøk
-                  <Magnifier className="text-muted" />
-                </Link>
-              </Dropdown.Item>
-              <Dropdown.Item key="abakus">
-                <Link
-                  href="https://abakus.no/"
-                  className="text-foreground flex w-full items-center justify-between gap-2"
-                >
-                  Abakus.no
-                  <ArrowUpRightFromSquare className="text-muted" />
-                </Link>
-              </Dropdown.Item>
+            <Dropdown.Menu onClick={() => setIsOpen(false)}>
+              <Dropdown.Item
+                textValue="Artikkelsøk"
+                id="search"
+                href={ROUTES.SEARCH}
+                render={({ ref, className: herouiClass }) => (
+                  <Link
+                    ref={ref as React.Ref<HTMLAnchorElement>}
+                    href={ROUTES.SEARCH}
+                    className={cn(
+                      herouiClass,
+                      "menu-item flex justify-between px-[10px]",
+                    )}
+                  >
+                    Artikkelsøk
+                    <Magnifier className="text-muted" />
+                  </Link>
+                )}
+              ></Dropdown.Item>
+              <Dropdown.Item
+                textValue="Abakus.no"
+                id="abakus"
+                href={"https://abakus.no/"}
+                render={({ ref, className: herouiClass }) => (
+                  <Link
+                    ref={ref as React.Ref<HTMLAnchorElement>}
+                    href={"https://abakus.no/"}
+                    className={cn(
+                      herouiClass,
+                      "menu-item flex justify-between px-[10px]",
+                    )}
+                  >
+                    Abakus.no
+                    <ArrowUpRightFromSquare className="text-muted" />
+                  </Link>
+                )}
+              ></Dropdown.Item>
               {!loading && user ? (
                 <>
-                  <Dropdown.Item key="edition_list">
-                    <Link
-                      href={ROUTES.ADMIN}
-                      className="text-foreground flex w-full items-center justify-between gap-2"
-                    >
-                      Admin
-                      <PersonGear className="text-muted" />
-                    </Link>
-                  </Dropdown.Item>
                   <Dropdown.Item
-                    key="logout"
+                    textValue="Admin"
+                    id="admin"
+                    href={ROUTES.ADMIN}
+                    render={({ ref, className: herouiClass }) => (
+                      <Link
+                        ref={ref as React.Ref<HTMLAnchorElement>}
+                        href={ROUTES.ADMIN}
+                        className={cn(
+                          herouiClass,
+                          "menu-item flex justify-between px-[10px]",
+                        )}
+                      >
+                        Admin
+                        <PersonGear className="text-muted" />
+                      </Link>
+                    )}
+                  ></Dropdown.Item>
+                  <Dropdown.Item
+                    textValue="Log ut"
+                    id="logout"
                     className="text-danger flex w-full items-center justify-between gap-2"
                     onPress={() => signOut(auth)}
                   >
