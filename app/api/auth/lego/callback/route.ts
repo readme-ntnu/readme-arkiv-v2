@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "lib/Firebase/firebaseAdmin";
+import { auth } from "lib/Firebase/server/firebaseAdmin";
 import { API_ROUTES, ROUTES } from "utils/routes";
 import getBaseUrl from "utils/baseUrl";
 import {

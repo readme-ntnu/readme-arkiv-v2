@@ -11,7 +11,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db, storage } from "./firebase";
-import { IArticle, IEditArticle, IEdition, INewEditionData } from "../types";
+import { IArticle, IEditArticle, IEdition, INewEditionData } from "../../types";
 
 export const deleteArticle = async (id: string) => {
   await deleteDoc(doc(db, `articles/${id}`));

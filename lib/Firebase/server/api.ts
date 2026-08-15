@@ -1,6 +1,6 @@
 import "server-only";
 
-import { IEdition, IEditionData } from "../types";
+import { IEdition, IEditionData } from "../../types";
 import { db, storage } from "./firebaseAdmin";
 
 // Edition list param allows us to opt out of filtering by listing

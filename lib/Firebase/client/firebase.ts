@@ -3,7 +3,7 @@ import { connectAuthEmulator, getAuth } from "firebase/auth";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
 import { connectFunctionsEmulator, getFunctions } from "firebase/functions";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
-import { config } from "./config";
+import { config } from "../config";
 
 if (!getApps().length) {
   initializeApp(config);

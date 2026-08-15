@@ -1,5 +1,5 @@
 import EditionsOverview from "app/admin/editions/_components/EditionsOverview";
-import { getEditions } from "../../../lib/Firebase/firebaseServersideAPIs";
+import { getEditions } from "../../../lib/Firebase/server/api";
 import { Metadata } from "next";
 import EditionsHeading from "./_components/EditionsHeading";
 

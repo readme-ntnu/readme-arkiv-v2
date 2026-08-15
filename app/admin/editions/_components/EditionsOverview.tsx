@@ -10,7 +10,7 @@ import {
   useOverlayState,
 } from "@heroui/react";
 import { FC, useState } from "react";
-import { deleteEdition } from "../../../../lib/Firebase/firebaseClientAPIs";
+import { deleteEdition } from "../../../../lib/Firebase/client/api";
 import { IEdition, IEditionData } from "../../../../lib/types";
 import React from "react";
 import { useRouter } from "next/navigation";

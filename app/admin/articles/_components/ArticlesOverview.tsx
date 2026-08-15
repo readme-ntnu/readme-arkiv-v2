@@ -18,9 +18,9 @@ import { ROUTES } from "../../../../utils/routes";
 import {
   deleteArticle,
   getPageNumber,
-} from "../../../../lib/Firebase/firebaseClientAPIs";
+} from "../../../../lib/Firebase/client/api";
 import { IArticle } from "../../../../lib/types";
-import { useArticleList } from "../../../../lib/Firebase/hooks";
+import { useArticleList } from "../../../../lib/Firebase/client/hooks";
 import { ArrowUpRightFromSquare, Pencil, TrashBin } from "@gravity-ui/icons";
 import Link from "next/link";
 

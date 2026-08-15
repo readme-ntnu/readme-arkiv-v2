@@ -4,7 +4,7 @@ import { FC, useState } from "react";
 import { LightSwitch } from "./LightSwitch";
 import { ROUTES } from "../utils/routes";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../lib/Firebase/firebase";
+import { auth } from "../lib/Firebase/client/firebase";
 import { signOut } from "firebase/auth";
 import {
   Avatar,

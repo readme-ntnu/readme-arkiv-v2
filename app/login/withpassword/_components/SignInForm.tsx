@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEventHandler, useState } from "react";
-import { auth } from "../../../../lib/Firebase/firebase";
+import { auth } from "../../../../lib/Firebase/client/firebase";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import {
   Alert,
@@ -18,7 +18,7 @@ import { Envelope, Eye, EyeSlash, Lock } from "@gravity-ui/icons";
 import Link from "next/link";
 import { ROUTES } from "../../../../utils/routes";
 import { useRouter } from "next/navigation";
-import { syncFirebaseAuthTokenWithServiceWorker } from "lib/Firebase/firebaseAuthServiceWorkerClient";
+import { syncFirebaseAuthTokenWithServiceWorker } from "lib/Firebase/client/firebaseAuthServiceWorker";
 
 export default function SignInForm() {
   const [signInWithEmailAndPassword, _, loading, error] =
