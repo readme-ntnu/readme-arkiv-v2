@@ -1,5 +1,7 @@
+import "server-only";
+
 import admin from "firebase-admin";
-import { config } from "./config";
+import { config } from "../config";
 
 if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true") {
   console.log("Firebase Admin SDK is using emulators.");

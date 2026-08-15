@@ -3,10 +3,10 @@
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithCustomToken } from "firebase/auth";
-import { auth } from "lib/Firebase/firebase";
+import { auth } from "lib/Firebase/client/firebase";
 import { Spinner } from "@heroui/react";
 import { ROUTES } from "utils/routes";
-import { syncFirebaseAuthTokenWithServiceWorker } from "../../../lib/Firebase/firebaseAuthServiceWorkerClient";
+import { syncFirebaseAuthTokenWithServiceWorker } from "../../../lib/Firebase/client/firebaseAuthServiceWorker";
 
 function CompleteLoginContent() {
   const router = useRouter();

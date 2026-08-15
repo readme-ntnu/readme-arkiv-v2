@@ -6,7 +6,7 @@ import { ArticleForm } from "../_components/ArticleForm";
 import {
   getArticleByID,
   updateArticle,
-} from "../../../../lib/Firebase/firebaseClientAPIs";
+} from "../../../../lib/Firebase/client/api";
 import { IEditArticle } from "../../../../lib/types";
 
 import { Spinner } from "@heroui/react";

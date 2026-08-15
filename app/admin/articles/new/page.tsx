@@ -2,7 +2,7 @@
 
 import { ROUTES } from "../../../../utils/routes";
 import { ArticleForm } from "../_components/ArticleForm";
-import { addNewArticle } from "../../../../lib/Firebase/firebaseClientAPIs";
+import { addNewArticle } from "../../../../lib/Firebase/client/api";
 import PageHeader from "@/components/PageHeader";
 
 export default function Page() {

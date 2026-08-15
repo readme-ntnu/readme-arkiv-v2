@@ -7,7 +7,7 @@ import {
   ISubmitEditionFunction,
 } from "../../../../../lib/types";
 import { Formik } from "formik";
-import { addEdition } from "../../../../../lib/Firebase/firebaseClientAPIs";
+import { addEdition } from "../../../../../lib/Firebase/client/api";
 import { PDFDocument } from "pdf-lib";
 import {
   Alert,

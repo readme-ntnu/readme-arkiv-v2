@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getAuthenticatedUser } from "../../lib/Firebase/serverAuth";
+import { getAuthenticatedUser } from "../../lib/Firebase/server/auth";
 import { ROUTES } from "utils/routes";
 import { AdminNavigation } from "./_components/AdminNavigation";
 
