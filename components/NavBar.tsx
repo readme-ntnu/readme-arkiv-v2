@@ -6,7 +6,14 @@ import { ROUTES } from "../utils/routes";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../lib/Firebase/firebase";
 import { signOut } from "firebase/auth";
-import { Avatar, Button, Dropdown, buttonVariants, cn } from "@heroui/react";
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  buttonVariants,
+  cn,
+  toast,
+} from "@heroui/react";
 import { ReadmeLogo } from "./ReadmeLogo";
 import {
   Bars,
@@ -18,11 +25,20 @@ import {
   Person,
 } from "@gravity-ui/icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export const NavBar: FC = () => {
   const [user, loading] = useAuthState(auth);
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    signOut(auth);
+    router.push(ROUTES.HOME);
+    toast.success("Du har logget ut!");
+  };
 
   return (
     <nav className="py-5 px-5 md:px-10 flex justify-between items-center bg-background gap-5">
@@ -133,7 +149,7 @@ export const NavBar: FC = () => {
                     textValue="Log ut"
                     id="logout"
                     className="text-danger flex w-full items-center justify-between gap-2"
-                    onPress={() => signOut(auth)}
+                    onPress={handleSignOut}
                   >
                     Log ut
                     <ArrowRightFromSquare />

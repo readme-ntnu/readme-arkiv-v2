@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowLeft } from "@gravity-ui/icons";
 import { buttonVariants, cn } from "@heroui/react";
 import Link from "next/link";

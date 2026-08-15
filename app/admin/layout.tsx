@@ -1,71 +1,18 @@
-"use client";
-
-import { WithAuthentication } from "@/components/WithAuthentication";
-import { BookOpen, FileText, Gear } from "@gravity-ui/icons";
-import { Tabs } from "@heroui/react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useMemo } from "react";
+import { redirect } from "next/navigation";
+import { getAuthenticatedUser } from "../../lib/Firebase/serverAuth";
 import { ROUTES } from "utils/routes";
+import { AdminNavigation } from "./_components/AdminNavigation";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  const user = await getAuthenticatedUser();
 
-  const currentTab = useMemo(() => {
-    if (pathname.includes(ROUTES.ARTICLE_LIST)) return ROUTES.ARTICLE_LIST;
-    if (pathname.includes(ROUTES.EDITION_LIST)) return ROUTES.EDITION_LIST;
-    return pathname;
-  }, [pathname]);
+  if (!user) {
+    redirect(ROUTES.LOGIN);
+  }
 
-  return (
-    <WithAuthentication>
-      <div className="max-w-[1200px] w-full">
-        <Tabs
-          className="w-full mb-3"
-          variant="secondary"
-          selectedKey={currentTab}
-        >
-          <Tabs.ListContainer>
-            <Tabs.List aria-label="Options">
-              <Tabs.Tab
-                href={ROUTES.EDITION_LIST}
-                id={ROUTES.EDITION_LIST}
-                render={(domProps: any) => <Link {...domProps} />}
-                className="w-[130px]"
-              >
-                <BookOpen className="mr-2" />
-                Utgaver
-                <Tabs.Indicator />
-              </Tabs.Tab>
-              <Tabs.Tab
-                href={ROUTES.ARTICLE_LIST}
-                id={ROUTES.ARTICLE_LIST}
-                render={(domProps: any) => <Link {...domProps} />}
-                className="w-[130px]"
-              >
-                <FileText className="mr-2" />
-                Artikler
-                <Tabs.Indicator />
-              </Tabs.Tab>
-              <Tabs.Tab
-                href={ROUTES.SETTINGS}
-                id={ROUTES.SETTINGS}
-                render={(domProps: any) => <Link {...domProps} />}
-                className="w-[130px]"
-              >
-                <Gear className="mr-2" />
-                Instillinger
-                <Tabs.Indicator />
-              </Tabs.Tab>
-            </Tabs.List>
-          </Tabs.ListContainer>
-        </Tabs>
-        {children}
-      </div>
-    </WithAuthentication>
-  );
+  return <AdminNavigation>{children}</AdminNavigation>;
 }

@@ -1,20 +1,18 @@
-"use client";
-
-import { auth } from "lib/Firebase/firebase";
-import { useRouter } from "next/navigation";
-import { ReactNode, useEffect } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
+import { getAuthenticatedUser } from "../../lib/Firebase/serverAuth";
 import { ROUTES } from "utils/routes";
 
-export default function LoginLayout({ children }: { children: ReactNode }) {
-  const [authUser, authLoading] = useAuthState(auth);
-  const router = useRouter();
+export default async function LoginLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const user = await getAuthenticatedUser();
 
-  useEffect(() => {
-    if (!authLoading && authUser) {
-      router.push(ROUTES.ADMIN);
-    }
-  }, [authUser, authLoading, router]);
+  if (user) {
+    redirect(ROUTES.ADMIN);
+  }
 
   return <>{children}</>;
 }
