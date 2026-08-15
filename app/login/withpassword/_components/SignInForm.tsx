@@ -1,12 +1,8 @@
 "use client";
 
-import { FormEventHandler, useEffect, useState } from "react";
+import { FormEventHandler, useState } from "react";
 import { auth } from "../../../../lib/Firebase/firebase";
-import {
-  useAuthState,
-  useSignInWithEmailAndPassword,
-} from "react-firebase-hooks/auth";
-import { useRouter } from "next/navigation";
+import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import {
   Alert,
   Button,
@@ -18,16 +14,15 @@ import {
   Spinner,
   TextField,
 } from "@heroui/react";
-import { ROUTES } from "../../../../utils/routes";
 import { Envelope, Eye, EyeSlash, Lock } from "@gravity-ui/icons";
 import Link from "next/link";
+import { ROUTES } from "../../../../utils/routes";
+import { useRouter } from "next/navigation";
+import { syncFirebaseAuthTokenWithServiceWorker } from "lib/Firebase/firebaseAuthServiceWorkerClient";
 
 export default function SignInForm() {
   const [signInWithEmailAndPassword, _, loading, error] =
     useSignInWithEmailAndPassword(auth);
-  const [authUser, authLoading] = useAuthState(auth);
-  const router = useRouter();
-
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPasswordEmpty, setIsPasswordEmpty] = useState(true);
 
@@ -35,17 +30,21 @@ export default function SignInForm() {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const router = useRouter();
+
+  const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     let data = Object.fromEntries(new FormData(e.currentTarget));
-    signInWithEmailAndPassword(data.email as string, data.password as string);
-  };
 
-  useEffect(() => {
-    if (!authLoading && authUser) {
-      router.push(ROUTES.ADMIN);
-    }
-  }, [authUser, authLoading, router]);
+    const user = await signInWithEmailAndPassword(
+      data.email as string,
+      data.password as string,
+    );
+    if (!user) return;
+
+    await syncFirebaseAuthTokenWithServiceWorker(user.user);
+    router.push(ROUTES.ADMIN);
+  };
 
   return (
     <Form onSubmit={onSubmit} className="flex flex-col w-full gap-4">

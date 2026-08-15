@@ -6,6 +6,7 @@ import { signInWithCustomToken } from "firebase/auth";
 import { auth } from "lib/Firebase/firebase";
 import { Spinner } from "@heroui/react";
 import { ROUTES } from "utils/routes";
+import { syncFirebaseAuthTokenWithServiceWorker } from "../../../lib/Firebase/firebaseAuthServiceWorkerClient";
 
 function CompleteLoginContent() {
   const router = useRouter();
@@ -22,6 +23,9 @@ function CompleteLoginContent() {
     }
 
     signInWithCustomToken(auth, token)
+      .then((credential) =>
+        syncFirebaseAuthTokenWithServiceWorker(credential.user),
+      )
       .then(() => {
         router.replace(ROUTES.ADMIN);
       })

@@ -1,5 +1,3 @@
-"use client";
-
 import { buttonVariants, cn } from "@heroui/react";
 import { ROUTES } from "../../../../utils/routes";
 import PageHeader from "@/components/PageHeader";
