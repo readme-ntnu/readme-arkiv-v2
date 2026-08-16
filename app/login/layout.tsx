@@ -1,13 +1,10 @@
 import { redirect } from "next/navigation";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { getAuthenticatedUser } from "../../lib/Firebase/server/auth";
 import { ROUTES } from "utils/routes";
+import { LoadingSpinner } from "../../components/LoadingSpinner";
 
-export default async function LoginLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+async function LoginAuthGuard({ children }: { children: ReactNode }) {
   const user = await getAuthenticatedUser();
 
   if (user) {
@@ -15,4 +12,12 @@ export default async function LoginLayout({
   }
 
   return <>{children}</>;
+}
+
+export default function LoginLayout({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <LoginAuthGuard>{children}</LoginAuthGuard>
+    </Suspense>
+  );
 }

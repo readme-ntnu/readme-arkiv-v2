@@ -1,5 +1,3 @@
-"use client";
-
 import { cn, linkVariants } from "@heroui/react";
 import Link from "next/link";
 import { ROUTES } from "utils/routes";
