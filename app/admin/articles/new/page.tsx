@@ -20,7 +20,7 @@ export default function Page() {
             () => {
               setSubmitting(false);
               setStatus({ error: true });
-            }
+            },
           )
         }
       />

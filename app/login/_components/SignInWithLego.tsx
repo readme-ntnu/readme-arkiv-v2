@@ -1,5 +1,3 @@
-"use client";
-
 import { buttonVariants, cn } from "@heroui/react";
 import Image from "next/image";
 import { API_ROUTES } from "utils/routes";

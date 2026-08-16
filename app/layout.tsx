@@ -4,6 +4,7 @@ import Providers from "./providers";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
 import { Favicon } from "@/components/Favicon";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "readme - arkiv",
@@ -32,6 +33,7 @@ export default function RootLayout({
           <div className="relative min-h-screen">
             <NavBar />
             <main className="pt-5 px-5 md:px-10 pb-[100px] gap-[20px] flex flex-col items-center">
+              {/* <Suspense fallback={null}>{children}</Suspense> */}
               {children}
             </main>
             <Footer />

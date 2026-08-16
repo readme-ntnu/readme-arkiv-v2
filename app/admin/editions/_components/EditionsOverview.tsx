@@ -15,6 +15,7 @@ import { IEdition, IEditionData } from "../../../../lib/types";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowUpRightFromSquare, TrashBin } from "@gravity-ui/icons";
+import { updateEditionsCache } from "lib/Firebase/server/actions";
 
 const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
   editionData,
@@ -41,6 +42,9 @@ const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
           </>,
         );
         router.refresh();
+      })
+      .then(() => {
+        updateEditionsCache();
       })
       .catch((error) => {
         setIsDeleteLoading(false);

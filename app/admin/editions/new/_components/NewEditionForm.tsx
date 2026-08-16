@@ -8,6 +8,7 @@ import {
 } from "../../../../../lib/types";
 import { Formik } from "formik";
 import { addEdition } from "../../../../../lib/Firebase/client/api";
+import { updateEditionsCache } from "../../../../../lib/Firebase/server/actions";
 import { PDFDocument } from "pdf-lib";
 import {
   Alert,
@@ -68,6 +69,7 @@ const NewEditionForm: NextPage = () => {
     await addEdition({ ...values, editionFile: fileToUpload }, (progress) =>
       setStatus({ progress: progress }),
     )
+      .then(updateEditionsCache)
       .then(() => setStatus({ success: true, progress: 100 }))
       .catch(() => setStatus({ error: true }));
   };

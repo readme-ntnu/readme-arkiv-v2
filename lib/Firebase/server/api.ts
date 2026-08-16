@@ -1,12 +1,18 @@
 import "server-only";
 
+import { cacheLife, cacheTag } from "next/cache";
 import { IEdition, IEditionData } from "../../types";
+import { EDITIONS_CACHE_TAG } from "./cacheTags";
 import { db, storage } from "./firebaseAdmin";
 
 // Edition list param allows us to opt out of filtering by listing
 export async function getEditions(
   filterListingEditions: boolean = false,
 ): Promise<IEditionData[]> {
+  "use cache";
+  cacheLife("max");
+  cacheTag(EDITIONS_CACHE_TAG);
+
   const pdfRefs = await storage.bucket().getFiles({ prefix: "pdf/" });
   const showListing = await (
     await db.collection("settings").get()

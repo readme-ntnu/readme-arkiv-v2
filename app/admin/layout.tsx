@@ -1,13 +1,11 @@
 import { redirect } from "next/navigation";
+import { Suspense, type ReactNode } from "react";
 import { getAuthenticatedUser } from "../../lib/Firebase/server/auth";
 import { ROUTES } from "utils/routes";
 import { AdminNavigation } from "./_components/AdminNavigation";
+import { LoadingSpinner } from "../../components/LoadingSpinner";
 
-export default async function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+async function AdminAuthGuard({ children }: { children: ReactNode }) {
   const user = await getAuthenticatedUser();
 
   if (!user) {
@@ -15,4 +13,12 @@ export default async function AdminLayout({
   }
 
   return <AdminNavigation>{children}</AdminNavigation>;
+}
+
+export default function AdminLayout({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <AdminAuthGuard>{children}</AdminAuthGuard>
+    </Suspense>
+  );
 }
