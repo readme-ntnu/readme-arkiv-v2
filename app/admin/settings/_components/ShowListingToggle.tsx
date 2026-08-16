@@ -10,7 +10,7 @@ export const ShowListingToggle: FC = () => {
 
   function toggleShowListing() {
     updateSettings({ ...settings, showListing: !settings?.showListing })
-      .then(() => updateEditionsCache())
+      .then(updateEditionsCache)
       .then(() =>
         toast.success("Instilling er oppdatert", {
           description:

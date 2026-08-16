@@ -33,6 +33,7 @@ const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
   const handleDeleteEdition = (edition: string) => {
     setIsDeleteLoading(true);
     deleteEdition(edition)
+      .then(updateEditionsCache)
       .then(() => {
         setIsDeleteLoading(false);
         overlayState.close();
@@ -42,9 +43,6 @@ const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
           </>,
         );
         router.refresh();
-      })
-      .then(() => {
-        updateEditionsCache();
       })
       .catch((error) => {
         setIsDeleteLoading(false);
