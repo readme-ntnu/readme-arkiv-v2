@@ -87,10 +87,17 @@ serviceWorker.addEventListener("fetch", (event: FetchEvent) => {
   event.respondWith(
     getIdTokenPromise()
       .then((idToken) => {
-        // Once Firebase persistence has caught up, stop using the handoff token
-        // so a later sign-out cannot accidentally keep an old token alive.
-        if (idToken) messagedIdToken = null;
-        return idToken ?? messagedIdToken;
+        const token = idToken ?? messagedIdToken;
+        // Once Firebase persistence has caught up, stop using the handoff token.
+        if (idToken) {
+          messagedIdToken = null;
+        } else if (token && event.request.mode === "navigate") {
+          // Consume the handoff token after the first navigation request to reduce
+          // the risk of keeping a stale token alive (e.g., if the user signs out
+          // before persistence reaches the worker).
+          messagedIdToken = null;
+        }
+        return token;
       })
       .catch(() => messagedIdToken)
       .then(requestProcessor),
