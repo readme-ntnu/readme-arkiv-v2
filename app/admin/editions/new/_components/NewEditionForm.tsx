@@ -143,6 +143,7 @@ const NewEditionForm: NextPage = () => {
                   useGrouping: false,
                 }}
                 isRequired
+                isDisabled={disableForm}
               >
                 <Label>Utgaveår</Label>
                 <NumberField.Group>
@@ -163,6 +164,7 @@ const NewEditionForm: NextPage = () => {
                 isRequired
                 minValue={1}
                 maxValue={6}
+                isDisabled={disableForm}
               >
                 <Label>Utgavenummer</Label>
                 <NumberField.Group>
@@ -274,15 +276,17 @@ const NewEditionForm: NextPage = () => {
                     forsiden! I mellomtiden kan du gjøre følgende:
                   </Alert.Description>
                   <div className="flex gap-[10px] mt-[10px]">
-                    <Link
+                    <a
                       href={ROUTES.EDITION.replace(
                         ":id",
                         `${values.editionYear}-0${values.editionNumber}`,
                       )}
                       className={buttonVariants({ variant: "tertiary" })}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
                       Åpne utgave
-                    </Link>
+                    </a>
                     <Link
                       href={ROUTES.NEW_ARTICLE}
                       className={buttonVariants({ variant: "tertiary" })}

@@ -90,7 +90,7 @@ export default function ArticleOverview() {
                     <div className="relative flex items-center gap-[0px]">
                       <Tooltip>
                         <Tooltip.Trigger>
-                          <Link
+                          <a
                             href={
                               ROUTES.EDITION.replace(":id", item.edition) +
                               `#page=${getPageNumber(item)}`
@@ -102,9 +102,11 @@ export default function ArticleOverview() {
                                 size: "sm",
                               }),
                             )}
+                            target="_blank"
+                            rel="noopener noreferrer"
                           >
                             <ArrowUpRightFromSquare />
-                          </Link>
+                          </a>
                         </Tooltip.Trigger>
                         <Tooltip.Content>
                           Åpne artikkel i utgave
@@ -121,6 +123,7 @@ export default function ArticleOverview() {
                                 size: "sm",
                               }),
                             )}
+                            prefetch={false}
                           >
                             <Pencil />
                           </Link>

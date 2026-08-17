@@ -192,6 +192,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
                 onBlur={handleBlur}
                 isRequired
                 className="flex-1"
+                isDisabled={disabled}
               >
                 <Label>Tittel</Label>
                 <Input />
@@ -204,6 +205,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
                 onInputChange={(value) => setFieldValue("type", value)}
                 onBlur={handleBlur}
                 className="flex-1"
+                isDisabled={disabled}
               >
                 <Label>
                   Spalte
@@ -237,6 +239,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
                 }}
                 isRequired
                 className="flex-1"
+                isDisabled={disabled}
               >
                 <Label>Utgaveår</Label>
                 <NumberField.Group>
@@ -258,6 +261,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
                 minValue={1}
                 maxValue={6}
                 className="flex-1"
+                isDisabled={disabled}
               >
                 <Label>Utgavenummer</Label>
                 <NumberField.Group>
@@ -275,6 +279,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
               onBlur={handleBlur}
               isRequired
               className="w-full"
+              isDisabled={disabled}
             >
               <Label>Skribent</Label>
               <Input />
@@ -287,6 +292,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
               onBlur={handleBlur}
               isRequired
               className="w-full"
+              isDisabled={disabled}
             >
               <Label>Layout</Label>
               <Input />
@@ -298,6 +304,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
               onChange={(value) => setFieldValue("photo", value)}
               onBlur={handleBlur}
               className="w-full"
+              isDisabled={disabled}
             >
               <Label>Foto</Label>
               <Input />
@@ -311,6 +318,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
               onPaste={onPaste}
               className="w-full"
               isRequired
+              isDisabled={disabled}
             >
               <Label>
                 Tekst
@@ -326,6 +334,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
               onBlur={handleBlur}
               isRequired
               className="w-full"
+              isDisabled={disabled}
             >
               <Label>
                 Sidetall
@@ -342,6 +351,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
               onBlur={() => {
                 setFieldTouched("tags", true);
               }}
+              isDisabled={disabled}
             >
               <Label>
                 Tags

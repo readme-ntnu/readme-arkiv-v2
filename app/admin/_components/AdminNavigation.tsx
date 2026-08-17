@@ -28,7 +28,9 @@ export function AdminNavigation({ children }: { children: React.ReactNode }) {
             <Tabs.Tab
               href={ROUTES.EDITION_LIST}
               id={ROUTES.EDITION_LIST}
-              render={(domProps: any) => <Link {...domProps} />}
+              render={(domProps: any) => (
+                <Link {...domProps} prefetch={false} />
+              )}
               className="w-[130px]"
             >
               <BookOpen className="mr-2" />
@@ -38,7 +40,9 @@ export function AdminNavigation({ children }: { children: React.ReactNode }) {
             <Tabs.Tab
               href={ROUTES.ARTICLE_LIST}
               id={ROUTES.ARTICLE_LIST}
-              render={(domProps: any) => <Link {...domProps} />}
+              render={(domProps: any) => (
+                <Link {...domProps} prefetch={false} />
+              )}
               className="w-[130px]"
             >
               <FileText className="mr-2" />
@@ -48,7 +52,9 @@ export function AdminNavigation({ children }: { children: React.ReactNode }) {
             <Tabs.Tab
               href={ROUTES.SETTINGS}
               id={ROUTES.SETTINGS}
-              render={(domProps: any) => <Link {...domProps} />}
+              render={(domProps: any) => (
+                <Link {...domProps} prefetch={false} />
+              )}
               className="w-[130px]"
             >
               <Gear className="mr-2" />

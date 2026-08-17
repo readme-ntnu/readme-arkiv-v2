@@ -56,6 +56,7 @@ export const FileInput: FC<FileInputProps> = ({
               }}
               data-invalid={error}
               data-disabled={isDisabled}
+              aria-disabled={isDisabled}
             >
               <ArrowUpFromSquare height={16} width={16} className="m-1" />
               <span className="flex flex-col">
@@ -73,10 +74,16 @@ export const FileInput: FC<FileInputProps> = ({
               }
               accept={acceptFormat}
               disabled={isDisabled}
+              data-disabled={isDisabled}
+              aria-disabled={isDisabled}
             />
           </>
         ) : (
-          <div className="w-full h-full flex gap-4 input-group p-4">
+          <div
+            className="w-full h-full flex gap-4 input-group p-4"
+            data-disabled={isDisabled}
+            aria-disabled={isDisabled}
+          >
             <File height={16} width={16} className="m-1" />
             <span className="flex flex-col flex-grow">
               <span className="font-semibold">{value.name}</span>

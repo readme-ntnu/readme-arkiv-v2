@@ -3,7 +3,9 @@
 import {
   AlertDialog,
   Button,
+  buttonVariants,
   Card,
+  cn,
   Spinner,
   toast,
   Tooltip,
@@ -13,14 +15,13 @@ import { FC, useState } from "react";
 import { deleteEdition } from "../../../../lib/Firebase/client/api";
 import { IEdition, IEditionData } from "../../../../lib/types";
 import React from "react";
-import { useRouter } from "next/navigation";
 import { ArrowUpRightFromSquare, TrashBin } from "@gravity-ui/icons";
 import { updateEditionsCache } from "lib/Firebase/server/actions";
+import { ROUTES } from "utils/routes";
 
 const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
   editionData,
 }) => {
-  const router = useRouter();
   const overlayState = useOverlayState();
   const [selectedEdition, setSelectedEdition] = useState<string | undefined>();
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
@@ -42,7 +43,6 @@ const EditionsOverview: FC<{ editionData: IEditionData[] }> = ({
             Utgave <strong>{edition}</strong> er slettet!
           </>,
         );
-        router.refresh();
       })
       .catch((error) => {
         setIsDeleteLoading(false);
@@ -139,20 +139,25 @@ const EditionCard: FC<{
       <div className="flex gap-[10px] m-2">
         <Tooltip delay={1000}>
           <Tooltip.Trigger>
-            <Button variant="tertiary" isIconOnly className="rounded-full">
+            <a
+              href={ROUTES.EDITION.replace(":id", `${year}-${edition.edition}`)}
+              className={cn(
+                buttonVariants({
+                  variant: "tertiary",
+                  isIconOnly: true,
+                }),
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <ArrowUpRightFromSquare />
-            </Button>
+            </a>
           </Tooltip.Trigger>
           <Tooltip.Content>Åpne opp i ny fane</Tooltip.Content>
         </Tooltip>
         <Tooltip delay={1000}>
           <Tooltip.Trigger>
-            <Button
-              variant="danger"
-              isIconOnly
-              className="rounded-full"
-              onPress={onDeletePressed}
-            >
+            <Button variant="danger" isIconOnly onPress={onDeletePressed}>
               <TrashBin />
             </Button>
           </Tooltip.Trigger>

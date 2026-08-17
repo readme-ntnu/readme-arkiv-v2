@@ -6,6 +6,7 @@ interface IProps {
   title: string;
   backButtonRoute?: string;
   endContent?: React.ReactNode;
+  disablePrefetch?: boolean;
 }
 
 export default function PageHeader(props: IProps) {
@@ -19,6 +20,7 @@ export default function PageHeader(props: IProps) {
               "rounded-full",
               buttonVariants({ variant: "ghost", isIconOnly: true }),
             )}
+            prefetch={!props.disablePrefetch}
           >
             <ArrowLeft className="h-[28px] w-[28px]" />
           </Link>
