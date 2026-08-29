@@ -4,7 +4,7 @@ Artikkel og utgavedatabase for studentmagasinet [readme](https://readme.abakus.n
 
 Dette er et [Next.js](https://nextjs.org/)-prosjekt satt opp med [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) og [Firebase](https://firebase.google.com/).
 
-Dette er en videreutvikling av det [gamle arkivet](https://github.com/readme-ntnu/readme-arkiv), som var byget som en ren React-app.
+Dette er en videreutvikling av det [gamle arkivet](https://github.com/readme-ntnu/readme-arkiv), som var bygget som en ren React-app.
 
 ## Kom igang
 
