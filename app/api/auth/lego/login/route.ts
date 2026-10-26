@@ -1,16 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import getBaseUrl from "utils/baseUrl";
-import { API_ROUTES } from "utils/routes";
+import { API_ROUTES, getSafeReturnTo } from "utils/routes";
 import {
   createPkcePair,
   LEGO_OAUTH_PKCE_COOKIE,
+  LEGO_OAUTH_RETURN_TO_COOKIE,
   LEGO_OAUTH_STATE_COOKIE,
   oauthCookieOptions,
-} from "../../../../../utils/oauth";
+} from "server/oauth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const state = crypto.randomUUID();
   const { verifier, challenge } = createPkcePair();
+  const returnTo = getSafeReturnTo(
+    request.nextUrl.searchParams.get("returnTo"),
+  );
 
   const params = new URLSearchParams({
     response_type: "code",
@@ -35,6 +39,11 @@ export async function GET() {
   });
 
   response.cookies.set(LEGO_OAUTH_PKCE_COOKIE, verifier, {
+    ...oauthCookieOptions,
+    maxAge: 10 * 60,
+  });
+
+  response.cookies.set(LEGO_OAUTH_RETURN_TO_COOKIE, returnTo, {
     ...oauthCookieOptions,
     maxAge: 10 * 60,
   });

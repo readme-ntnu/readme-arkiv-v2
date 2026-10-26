@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
-import { getAuthenticatedUser } from "../../lib/Firebase/server/auth";
+import { getAuthenticatedUser } from "server/auth";
 import { ROUTES } from "utils/routes";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 

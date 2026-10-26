@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
-import { getAuthenticatedUser } from "../../lib/Firebase/server/auth";
-import { ROUTES } from "utils/routes";
+import { getAuthenticatedUser, isReadmeMember } from "server/auth";
+import { addReturnTo, ROUTES } from "utils/routes";
 import { AdminNavigation } from "./_components/AdminNavigation";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 
@@ -9,7 +9,11 @@ async function AdminAuthGuard({ children }: { children: ReactNode }) {
   const user = await getAuthenticatedUser();
 
   if (!user) {
-    redirect(ROUTES.LOGIN);
+    redirect(addReturnTo(ROUTES.LOGIN, ROUTES.ADMIN));
+  }
+
+  if (!isReadmeMember(user)) {
+    redirect(ROUTES.HOME);
   }
 
   return <AdminNavigation>{children}</AdminNavigation>;

@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react";
 import { ArticleForm } from "../_components/ArticleForm";
 
-import {
-  getArticleByID,
-  updateArticle,
-} from "../../../../lib/Firebase/client/api";
-import { IEditArticle } from "../../../../lib/types";
+import { getArticleByID, updateArticle } from "client/articles";
+import type { IEditArticle } from "types/articles";
 
 import { Spinner } from "@heroui/react";
 import { ROUTES } from "../../../../utils/routes";

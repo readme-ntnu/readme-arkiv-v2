@@ -42,6 +42,15 @@ I den andre starter du Next-serveren ved å skrive:
 yarn dev
 ```
 
+Arkivet bruker nå Firestore-samlingen `editions` som katalog. De innsjekkede
+emulator-fixturene inneholder allerede disse dokumentene. Dersom du bruker et
+eldre eller selvlaget Storage-datasett, kjører du følgende mens emulatorene er
+startet for å opprette manglende katalogposter:
+
+```bash
+yarn editions:reconcile --apply
+```
+
 Du kan nå åpne nettsiden på [http://localhost:3000](http://localhost:3000).
 
 NB! Dersom du gjør endringer i `functions/` underveis må du kompilere TypeScript filene på nytt for at Functions-emulatoren skal oppdatere seg. Åpne en ny terminal og skriv `yarn build` fra `functions/`-mappen. Alternativt kan du skrive `yarn build:watch`. Da vil TypeScript filene automatisk kompilerers hver gang du lagrer nye endringer.
@@ -91,22 +100,24 @@ Her har vi fire forskjellige biter:
 
 **Functions:** Dette er den delen av backend-en som gjør beregninger for oss. I dette prosjektet har vi en fuksjon som lager en JPEG-thumbnail for oss hver gang noen laster opp en ny utgave. Denne funksjonen utløser også et nytt bygg av nettsiden.
 
-**Storage:** Dette er hvor vi faktisk lagrer selve utgave-PDF-ene og de tilhørende JPEG-thumbnail-ene. Det har en mappestruktur som ser slik ut: `{pdf/images}/{<<year>>}/{<<year>>}-{<<edition>>}.{pdf,jpg}`. Filbanen for PDF-en til utgave 01 i 2021 er da `pdf/2021/2021-01.pdf`, mens tilsvarende for thumbnail-en er `images/2021/2021-01.jpg`.
+**Storage:** Dette er hvor vi faktisk lagrer selve utgave-PDF-ene og de tilhørende JPEG-thumbnail-ene. Originalene ligger under `pdf/{år}/{år}-{utgave}.pdf`, valgfrie offentlig/redigerte versjoner ligger under `pdf_public/{år}/{år}-{utgave}_public.pdf`, og forsidebildene ligger under `images/{år}/{år}-{utgave}.jpg`. PDF-ene lastes opp direkte fra nettleseren til Storage og vises direkte fra Google Storage, slik at PDF-trafikken ikke går gjennom Vercel.
 
-**Firestore:** Dette er hvor artiklene i hver utgave lagres. Hver rad i samlingen `articles` har oppsett som under. Merk at feltene kan være tomme, avhengig av typen artikkel.
+**Firestore:** Samlingen `editions` er den autoritative katalogen over utgaver. Hvert dokument heter `YYYY-NN` og inneholder `editionYear`, `editionNumber`, `listinglop` og tekniske beskrivelser i `originalPdf`, `publicPdf` og `thumbnail`. Filbeskrivelsene har også en `status` (`unknown`, `available`, `missing` eller `invalid`) som oppdateres når filene kontrolleres. `thumbnail.originalPdfGeneration` lagres bare i Firestore, ikke som metadata på Storage-filen. Eldre poster uten statusfeltet vises som `unknown` frem til en tilgangskontroll eller rekonsiliering. Signerte URL-er eller Firebase-nedlastings-URL-er lagres aldri i Firestore.
 
-| Feltnavn | Datatype        | Betydning                                                      | Eksempel                                                                            |
-| -------- | --------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| author   | tekst           | Hvem som har skrevet artikkelen                                | "Tobias Skjelvik"                                                                   |
-| content  | tekst           | Det faktiske teksten i artikkelen                              | "readme er et veldig kult magasin..."                                               |
-| edition  | tekst           | Utgavenummer, på formen `{utgaveår}-0{utgavenummer}`           | "2023-01"                                                                           |
-| layout   | tekst           | Hvem som har hatt layout på artikkelen                         | "Øyvind Monsen"                                                                     |
-| pages    | liste med tall  | hvilke sider artikkelen er på iht. utgaveplanen                | [8, 9]                                                                              |
-| photo    | tekst           | Hvem som har tatt bilder til artikkelen                        | "Simen Holmestad"                                                                   |
-| tags     | liste med tekst | Stikkord som beksriver innholdet i artikkelen. Brukes til søk. | ["kake", "korona", "fest"]                                                          |
-| title    | tekst           | Artikkeloverskriften                                           | "Arrkoms korona-party: Hva er greia?"                                               |
-| type     | tekst           | Hvilken spalte artikkelen utkom i                              | "Gløsløken"                                                                         |
-| url      | tekst/lenke     | Lenke til pdf-en som artikkelen er i, med "page hash"          | https://storage.googleapis.com/readme-arkiv.appspot.com/pdf/2021/2021-03.pdf#page=5 |
+Samlingen `articles` inneholder artiklene i hver utgave. Artikkellenker skal bruke `/edition/YYYY-NN#page=N`, ikke en direkte Storage-URL. Merk at feltene kan være tomme, avhengig av typen artikkel.
+
+| Feltnavn | Datatype        | Betydning                                                      | Eksempel                              |
+| -------- | --------------- | -------------------------------------------------------------- | ------------------------------------- |
+| author   | tekst           | Hvem som har skrevet artikkelen                                | "Tobias Skjelvik"                     |
+| content  | tekst           | Det faktiske teksten i artikkelen                              | "readme er et veldig kult magasin..." |
+| edition  | tekst           | Utgavenummer, på formen `{utgaveår}-0{utgavenummer}`           | "2023-01"                             |
+| layout   | tekst           | Hvem som har hatt layout på artikkelen                         | "Øyvind Monsen"                       |
+| pages    | liste med tall  | hvilke sider artikkelen er på iht. utgaveplanen                | [8, 9]                                |
+| photo    | tekst           | Hvem som har tatt bilder til artikkelen                        | "Simen Holmestad"                     |
+| tags     | liste med tekst | Stikkord som beksriver innholdet i artikkelen. Brukes til søk. | ["kake", "korona", "fest"]            |
+| title    | tekst           | Artikkeloverskriften                                           | "Arrkoms korona-party: Hva er greia?" |
+| type     | tekst           | Hvilken spalte artikkelen utkom i                              | "Gløsløken"                           |
+| url      | tekst/lenke     | Kanonisk lenke til utgaven, med "page hash"                    | /edition/2021-03#page=5               |
 
 Det finnes også en samling som heter `settings`. Denne har ett dokument som styrer litt hemmelig funksjonalitet i admin-siden.
 
@@ -121,3 +132,49 @@ Vi bruker [Algolia](https://www.algolia.com/) for å drive søket på nettsiden.
 ## Tilganger
 
 For å gjøre endringer i produksjonskonfigurasjonen til Firebase, Vercel, eller Algolia, må du få tilgang av en som allerede har det. Ta kontakt med [Viljan](https://github.com/viljanvr).
+
+### Migrering av utgavekatalog
+
+Vedlikeholdsverktøyet bruker Firebase-emulatorene og er skrivebeskyttet som
+standard. Det oppretter manglende katalogposter og oppdaterer eksisterende
+poster som avviker fra Storage:
+
+```bash
+yarn editions:reconcile
+yarn editions:reconcile --apply
+```
+
+Bruk `--environment production` for å lese fra produksjon. Produksjonsendringer
+krever i tillegg både `--apply` og eksplisitt `--confirm-project readme-arkiv`:
+
+```bash
+yarn editions:reconcile --environment production --project readme-arkiv
+yarn editions:reconcile --environment production --project readme-arkiv \
+  --apply --confirm-project readme-arkiv
+```
+
+Reconcile setter også PDF-enes synlige nedlastingsnavn til
+`YYYY-NN.pdf` uten å endre Storage-stien, og retter gamle thumbnails som mangler
+innholdstypen `image/jpeg`.
+
+### Brukertilgang
+
+Firebase-brukere kan gis readme-tilgang med brukerskriptet. Det bruker
+Auth-emulatoren og kjører uten å skrive som standard:
+
+```bash
+yarn users:set-claims --email user@readme.no --member
+yarn users:set-claims --email user@readme.no --admin --apply
+yarn users:set-claims --email user@readme.no --remove --apply
+yarn users:set-claims --email user@readme.no --list
+```
+
+Flere `--email`- og `--uid`-valg kan brukes i samme kjøring. Produksjonsendringer
+krever `--environment production`, `--apply` og `--confirm-project`, på samme
+måte som rekonsilieringsskriptet. Brukeren må logge inn på nytt eller oppdatere
+ID-tokenet før endringene blir synlige. `--member` fjerner en eventuell rolle,
+mens `--remove` fjerner både medlems- og rolle-claimet.
+
+Sikkerhetsreglene deployes ikke automatisk ved push før migreringen er ferdig.
+Kjør Firebase-workflowen manuelt med `deploy_security_rules` når katalogen er
+oppdatert og den nye visningen er kontrollert i produksjon.

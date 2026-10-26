@@ -2,7 +2,7 @@
   "name": "images/2020/2020-06.jpg",
   "bucket": "readme-arkiv.appspot.com",
   "contentType": "image/jpeg",
-  "metageneration": 1,
+  "metageneration": 2,
   "generation": 1629325680861,
   "storageClass": "STANDARD",
   "etag": "someETag",
@@ -12,7 +12,7 @@
     "eb699db8-c5ff-4232-899a-8b7c31ca6c50"
   ],
   "timeCreated": "2021-08-18T22:28:00.860Z",
-  "updated": "2021-08-18T22:28:00.862Z",
+  "updated": "2026-08-28T19:44:03.941Z",
   "size": 96336,
   "md5Hash": "VHWwJO+NpJzVig7jT2JLow==",
   "crc32c": "2932314360"

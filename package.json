@@ -9,6 +9,11 @@
     "build:service-worker": "tsc --project service-workers/tsconfig.json && esbuild service-workers/firebase-auth.worker.ts --bundle --outfile=public/firebase-auth-service-worker.js --format=iife --platform=browser --target=es2020",
     "start": "next start",
     "emulators": "yarn --cwd ./functions build && firebase emulators:start --import=./firebase-fixtures",
+    "editions:reconcile": "node scripts/edition-storage-maintenance.mjs",
+    "users:set-claims": "node scripts/set-user-claims.mjs",
+    "test": "yarn test:access && yarn test:rules",
+    "test:access": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/access-policy.test.mjs",
+    "test:rules": "firebase emulators:exec --config firebase.rules-test.json --project demo-readme-rules --only firestore,storage \"node --test tests/firebase-rules.test.mjs\"",
     "lint": "eslint ."
   },
   "engines": {
@@ -17,6 +22,7 @@
   "dependencies": {
     "@heroui/react": "^3.2.2",
     "@heroui/styles": "^3.2.2",
+    "@next/env": "^16.1.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/fs-extra": "^11.0.4",
     "@types/node-fetch": "^2.6.11",
@@ -42,10 +48,11 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@gravity-ui/icons": "^2.16.0",
     "@types/node": "^20.17.9",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "@types/react-instantsearch-dom": "^6.12.7",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
@@ -55,6 +62,6 @@
     "typescript": "^5.6.3"
   },
   "resolutions": {
-    "@types/react": "^18.3.12"
+    "@types/react": "^19.2.0"
   }
 }

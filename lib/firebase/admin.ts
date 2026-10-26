@@ -1,13 +1,13 @@
 import "server-only";
 
 import admin from "firebase-admin";
-import { config } from "../config";
+import { config } from "./firebaseConfig";
 
 if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true") {
   console.log("Firebase Admin SDK is using emulators.");
-  process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
-  process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099";
-  process.env.FIREBASE_STORAGE_EMULATOR_HOST = "localhost:9199";
+  process.env.FIRESTORE_EMULATOR_HOST ??= "localhost:8080";
+  process.env.FIREBASE_AUTH_EMULATOR_HOST ??= "localhost:9099";
+  process.env.FIREBASE_STORAGE_EMULATOR_HOST ??= "localhost:9199";
 }
 
 if (!admin.apps.length) {

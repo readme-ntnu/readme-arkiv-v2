@@ -15,12 +15,10 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 import { ROUTES } from "../../../../utils/routes";
-import {
-  deleteArticle,
-  getPageNumber,
-} from "../../../../lib/Firebase/client/api";
-import { IArticle } from "../../../../lib/types";
-import { useArticleList } from "../../../../lib/Firebase/client/hooks";
+import { deleteArticle } from "client/articles";
+import { useArticleList } from "client/articleHooks";
+import type { IArticle } from "types/articles";
+import { getPageNumber } from "utils/articles";
 import { ArrowUpRightFromSquare, Pencil, TrashBin } from "@gravity-ui/icons";
 import Link from "next/link";
 

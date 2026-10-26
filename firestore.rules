@@ -1,15 +1,31 @@
+rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
- 	 match /{collectionName}/{documentId} {
-     allow read, write : if collectionName == "settings" 
-                         && request.auth != null 
-                         && request.auth.token.firebase.sign_in_provider != 'anonymous' 
-                         && request.auth.token.readmeMember == true;
-     allow read, write : if collectionName == "articles" 
-                         && request.auth != null 
-                         && request.auth.token.firebase.sign_in_provider != 'anonymous' 
-                         && request.auth.token.readmeMember == true;
-		}
+    function isSignedInUser() {
+      return request.auth != null
+             && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    function isReadmeMember() {
+      return isSignedInUser()
+             && request.auth.token.readmeMember == true;
+    }
+
+    match /settings/{documentId} {
+      allow read, create, update, delete: if isReadmeMember();
+    }
+
+    match /articles/{documentId} {
+      allow read, create, update, delete: if isReadmeMember();
+    }
+
+    match /editions/{editionId} {
+      // Edition records are read and mutated only by the server using the
+      // Admin SDK. Browsers receive the smaller DTOs returned by Next.js.
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

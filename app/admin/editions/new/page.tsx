@@ -1,16 +1,16 @@
 import { ROUTES } from "../../../../utils/routes";
-import NewEditionForm from "app/admin/editions/new/_components/NewEditionForm";
 import PageHeader from "@/components/PageHeader";
+import EditionForm from "../_components/EditionForm";
 
 export default function Page() {
   return (
-    <div className="flex flex-col items-left gap-5 max-w-[350px] w-full mx-auto">
+    <div className="flex w-full max-w-[600px] flex-col items-start gap-5 mx-auto">
       <PageHeader
         title="Ny utgave"
         backButtonRoute={ROUTES.EDITION_LIST}
         disablePrefetch
       />
-      <NewEditionForm />
+      <EditionForm />
     </div>
   );
 }
