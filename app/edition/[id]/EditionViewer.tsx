@@ -2,13 +2,20 @@
 
 import { Spinner, buttonVariants, cn } from "@heroui/react";
 import { getIdToken } from "firebase/auth";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { auth } from "lib/firebase/client";
 import { addReturnTo, ROUTES } from "utils/routes";
 
+const PdfEditionViewer = dynamic(() => import("./PdfEditionViewer"), {
+  ssr: false,
+  loading: LoadingMessage,
+});
+
 type ViewerState =
   | { status: "loading" }
+  | { status: "ready"; url: string }
   | { status: "login"; message: string }
   | { status: "error"; message: string };
 
@@ -17,12 +24,6 @@ type AccessResponse = {
   code?: string;
   message?: string;
 };
-
-function getPageHash() {
-  const match = /^#page=([1-9]\d*)$/.exec(window.location.hash);
-  const page = Number(match?.[1]);
-  return Number.isSafeInteger(page) ? `#page=${page}` : "";
-}
 
 function ViewerMessage({ children }: { children: ReactNode }) {
   return (
@@ -118,7 +119,10 @@ export function EditionViewer({
             message: result.message ?? "Kunne ikke åpne utgaven.",
           });
         } else {
-          window.location.replace(`${result.url}${getPageHash()}`);
+          setState({
+            status: "ready",
+            url: result.url,
+          });
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError")
@@ -130,6 +134,10 @@ export function EditionViewer({
     void loadPdfUrl();
     return () => controller.abort();
   }, [editionId, requestedVersion]);
+
+  if (state.status === "ready") {
+    return <PdfEditionViewer key={state.url} url={state.url} />;
+  }
 
   if (state.status === "loading") return <LoadingMessage />;
 

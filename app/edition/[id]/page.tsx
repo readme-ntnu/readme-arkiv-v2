@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { isValidEditionId } from "utils/editions";
@@ -7,6 +7,12 @@ import { EditionViewer } from "./EditionViewer";
 type EditionPageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ version?: string | string[] }>;
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export async function generateMetadata({
