@@ -2,27 +2,30 @@
 
 import { Spinner, buttonVariants, cn } from "@heroui/react";
 import { getIdToken } from "firebase/auth";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { auth } from "lib/firebase/client";
+import type { EditionPdfVersion } from "types/editions";
 import { addReturnTo, ROUTES } from "utils/routes";
+
+const PdfEditionViewer = dynamic(() => import("./PdfEditionViewer"), {
+  ssr: false,
+  loading: LoadingMessage,
+});
 
 type ViewerState =
   | { status: "loading" }
+  | { status: "ready"; url: string; version: EditionPdfVersion }
   | { status: "login"; message: string }
   | { status: "error"; message: string };
 
 type AccessResponse = {
   url?: string;
+  version?: EditionPdfVersion;
   code?: string;
   message?: string;
 };
-
-function getPageHash() {
-  const match = /^#page=([1-9]\d*)$/.exec(window.location.hash);
-  const page = Number(match?.[1]);
-  return Number.isSafeInteger(page) ? `#page=${page}` : "";
-}
 
 function ViewerMessage({ children }: { children: ReactNode }) {
   return (
@@ -112,13 +115,17 @@ export function EditionViewer({
             status: "login",
             message: result.message ?? "Logg inn for å se originalversjonen.",
           });
-        } else if (!response.ok || !result.url) {
+        } else if (!response.ok || !result.url || !result.version) {
           setState({
             status: "error",
             message: result.message ?? "Kunne ikke åpne utgaven.",
           });
         } else {
-          window.location.replace(`${result.url}${getPageHash()}`);
+          setState({
+            status: "ready",
+            url: result.url,
+            version: result.version,
+          });
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError")
@@ -130,6 +137,20 @@ export function EditionViewer({
     void loadPdfUrl();
     return () => controller.abort();
   }, [editionId, requestedVersion]);
+
+  if (state.status === "ready") {
+    return (
+      <PdfEditionViewer
+        key={state.url}
+        url={state.url}
+        filename={`${editionId}_${state.version}.pdf`}
+        onDownload={async () => ({
+          url: state.url,
+          requiresClientDownload: true,
+        })}
+      />
+    );
+  }
 
   if (state.status === "loading") return <LoadingMessage />;
 
