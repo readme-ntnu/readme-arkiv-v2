@@ -2,7 +2,7 @@
   "name": "images/2021/2021-02.jpg",
   "bucket": "readme-arkiv.appspot.com",
   "contentType": "image/jpeg",
-  "metageneration": 1,
+  "metageneration": 2,
   "generation": 1629325798033,
   "storageClass": "STANDARD",
   "etag": "someETag",
@@ -10,7 +10,7 @@
   "contentEncoding": "identity",
   "downloadTokens": [],
   "timeCreated": "2021-08-18T22:29:58.032Z",
-  "updated": "2021-08-18T22:29:58.033Z",
+  "updated": "2026-08-28T19:44:03.959Z",
   "size": 59047,
   "md5Hash": "fsA3gSWegF5JRNt69p1Vnw==",
   "crc32c": "305603205"

@@ -6,7 +6,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "storage.googleapis.com",
+        hostname: "firebasestorage.googleapis.com",
         port: "",
         pathname: "/**",
       },
@@ -20,24 +20,15 @@ const nextConfig = {
     dangerouslyAllowLocalIP: true,
     minimumCacheTTL: 2678400, // 31 days cache for image optimisations (to avoid 500 limit)
   },
-  async rewrites() {
+  async redirects() {
     return [
       {
-        source: "/edition/:year-:no.pdf",
-        destination: editionURLPattern,
-      },
-      {
-        source: "/edition/:year-:no",
-        destination: editionURLPattern,
+        source: "/edition/:id.pdf",
+        destination: "/edition/:id",
+        permanent: true,
       },
     ];
   },
 };
-
-const editionURLPattern = `${
-  process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true"
-    ? "http://127.0.0.1:9199"
-    : "https://storage.googleapis.com"
-}/readme-arkiv.appspot.com/pdf/:year/:year-:no.pdf`;
 
 module.exports = nextConfig;

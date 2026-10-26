@@ -1,3 +1,5 @@
+"use client";
+
 import {
   collection,
   DocumentData,
@@ -13,13 +15,12 @@ import {
   QueryStartAtConstraint,
   SnapshotOptions,
   startAfter,
-  updateDoc,
   WithFieldValue,
 } from "firebase/firestore";
 import { useState } from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { IArticle, ISettings } from "../../types";
-import { db } from "./firebase";
+import { db } from "../lib/firebase/client";
+import type { IArticle } from "../types/articles";
 
 const articleConverter = {
   toFirestore(post: WithFieldValue<IArticle>): DocumentData {
@@ -27,7 +28,7 @@ const articleConverter = {
   },
   fromFirestore(
     snapshot: QueryDocumentSnapshot,
-    options: SnapshotOptions
+    options: SnapshotOptions,
   ): IArticle {
     const data = snapshot.data(options)!;
     return { ...data, id: snapshot.id } as IArticle;
@@ -53,8 +54,8 @@ export const useArticleList = () => {
   const [data, loading, error] = useCollectionData<IArticle>(
     query(
       collection(db, "articles").withConverter(articleConverter),
-      ...dynamicQuery
-    )
+      ...dynamicQuery,
+    ),
   );
 
   const [pageNum, setPageNum] = useState(0);
@@ -84,31 +85,4 @@ export const useArticleList = () => {
   };
 
   return [data, loading, error, pageNum, nextPage, prevPage] as const;
-};
-
-const settingsConverter = {
-  toFirestore(post: WithFieldValue<ISettings>): DocumentData {
-    return post;
-  },
-  fromFirestore(
-    snapshot: QueryDocumentSnapshot,
-    options: SnapshotOptions
-  ): ISettings {
-    const data = snapshot.data(options)!;
-    return { ...data } as ISettings;
-  },
-};
-
-export const useSettings = () => {
-  const [data, loading, error, snapshot] = useCollectionData<ISettings>(
-    query(collection(db, "settings").withConverter(settingsConverter))
-  );
-
-  const updateSettings = async (newSettings: ISettings) => {
-    if (snapshot) {
-      await updateDoc(snapshot.docs[0].ref, { ...newSettings });
-    }
-  };
-
-  return [data?.at(0), loading, error, updateSettings] as const;
 };

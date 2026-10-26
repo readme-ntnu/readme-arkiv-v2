@@ -1,6 +1,11 @@
-name: Deploy to Firebase Functions on merge
+name: Deploy Firebase backend
 "on":
   workflow_dispatch:
+    inputs:
+      deploy_security_rules:
+        description: Deploy Firestore indexes and security rules after migration
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -30,4 +35,9 @@ jobs:
       - uses: w9jds/setup-firebase@main
         with:
           gcp_sa_key: ${{ secrets.GCP_SA_KEY }}
-      - run: firebase deploy --only functions
+      - name: Deploy functions
+        run: firebase deploy --only functions
+
+      - name: Deploy indexes and security rules
+        if: github.event_name == 'workflow_dispatch' && inputs.deploy_security_rules
+        run: firebase deploy --only firestore:rules,firestore:indexes,storage

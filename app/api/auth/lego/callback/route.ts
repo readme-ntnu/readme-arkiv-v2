@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "lib/Firebase/server/firebaseAdmin";
-import { API_ROUTES, ROUTES } from "utils/routes";
+import { auth } from "lib/firebase/admin";
+import { API_ROUTES, getSafeReturnTo, ROUTES } from "utils/routes";
 import getBaseUrl from "utils/baseUrl";
 import {
   clearOAuthCookies,
   isFirebaseAuthError,
   LEGO_OAUTH_PKCE_COOKIE,
+  LEGO_OAUTH_RETURN_TO_COOKIE,
   LEGO_OAUTH_STATE_COOKIE,
-} from "../../../../../utils/oauth";
+} from "server/oauth";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -15,6 +16,9 @@ export async function GET(request: NextRequest) {
   const returnedState = searchParams.get("state");
   const storedState = request.cookies.get(LEGO_OAUTH_STATE_COOKIE)?.value;
   const codeVerifier = request.cookies.get(LEGO_OAUTH_PKCE_COOKIE)?.value;
+  const returnTo = getSafeReturnTo(
+    request.cookies.get(LEGO_OAUTH_RETURN_TO_COOKIE)?.value,
+  );
 
   if (!code) {
     const response = new NextResponse("Missing code", { status: 400 });
@@ -96,14 +100,6 @@ export async function GET(request: NextRequest) {
     (m: any) => m.abakusGroup === 10,
   );
 
-  if (!readmeMembership) {
-    const response = NextResponse.redirect(
-      `${getBaseUrl()}${ROUTES.LOGIN_ERROR}?message=${encodeURIComponent("Man må være medlem av readme for å få tilgang")}`,
-    );
-    clearOAuthCookies(response);
-    return response;
-  }
-
   const uid = `lego:${legoUser.id}`;
 
   // 4. Ensure Firebase user exists, and update if necessary
@@ -142,9 +138,10 @@ export async function GET(request: NextRequest) {
   });
 
   // 4. Redirect back to app
-  const response = NextResponse.redirect(
-    `${getBaseUrl()}${ROUTES.LOGIN_COMPLETE}?token=${firebaseToken}`,
-  );
+  const completeUrl = new URL(ROUTES.LOGIN_COMPLETE, getBaseUrl());
+  completeUrl.searchParams.set("token", firebaseToken);
+  completeUrl.searchParams.set("returnTo", returnTo);
+  const response = NextResponse.redirect(completeUrl);
   clearOAuthCookies(response);
   return response;
 }

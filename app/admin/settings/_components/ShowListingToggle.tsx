@@ -1,9 +1,9 @@
 "use client";
 
 import { FC } from "react";
-import { useSettings } from "../../../../lib/Firebase/client/hooks";
+import { useSettings } from "client/settings";
 import { Description, Switch, toast } from "@heroui/react";
-import { updateEditionsCache } from "lib/Firebase/server/actions";
+import { updateEditionsCache } from "actions/settings";
 
 export const ShowListingToggle: FC = () => {
   const [settings, loading, _, updateSettings] = useSettings();

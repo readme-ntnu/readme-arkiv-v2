@@ -4,19 +4,17 @@ import { FC, ClipboardEvent } from "react";
 
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { ISubmitArticleFunction, IEditArticle } from "../../../../lib/types";
+import type { IEditArticle, ISubmitArticleFunction } from "types/articles";
 import {
   Alert,
   Button,
   ComboBox,
-  Description,
   FieldError,
   Form,
   Input,
   Label,
   ListBox,
   NumberField,
-  Select,
   Spinner,
   TextArea,
   TextField,
@@ -122,7 +120,7 @@ export const ArticleForm: FC<ArticleFormProps> = ({
 
   return (
     <Formik
-      enableReinitialize
+      enableReinitialize={Boolean(article)}
       validationSchema={schema}
       onSubmit={(values, actions) =>
         doHandleSubmit(values as IEditArticle, actions)
@@ -139,7 +137,6 @@ export const ArticleForm: FC<ArticleFormProps> = ({
         isValid,
         errors,
         status,
-        setStatus,
         isSubmitting,
         resetForm,
         setFieldValue,
@@ -392,25 +389,37 @@ export const ArticleForm: FC<ArticleFormProps> = ({
             {status.success && (
               <Alert status="success">
                 <Alert.Indicator />
-                <Alert.Content>
-                  <Alert.Title>
-                    {article ? "Artikkel er endret!" : "Artikkel er lagt til!"}
-                  </Alert.Title>
-                  <Alert.Description>
-                    {!article &&
-                      "Tøm skjemaet dersom du ønsker å legge til enda en artikkel."}
-                  </Alert.Description>
+                <Alert.Content className="flex flex-row gap-3 justify-between">
+                  <div className="flex flex-col">
+                    <Alert.Title>
+                      {article
+                        ? "Artikkel er endret!"
+                        : "Artikkel er lagt til!"}
+                    </Alert.Title>
+                    <Alert.Description>
+                      {!article && `Trykk på knappen for å legge til flere.`}
+                    </Alert.Description>
+                  </div>
                   {!article && (
                     <Button
                       size="sm"
                       variant="tertiary"
                       onPress={() => {
-                        resetForm();
-                        setStatus({ success: false });
+                        const nextPage =
+                          Number(values.pages.split(", ").at(-1)) + 1;
+                        resetForm({
+                          values: {
+                            ...initialFormValues,
+                            editionYear: values.editionYear,
+                            editionNumber: values.editionNumber,
+                            pages: String(nextPage),
+                          },
+                          status: { success: false, error: false },
+                        });
                       }}
                       className="mt-2"
                     >
-                      Tøm skjema
+                      Ny artikkel
                     </Button>
                   )}
                 </Alert.Content>

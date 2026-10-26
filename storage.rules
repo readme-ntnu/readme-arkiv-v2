@@ -1,18 +1,87 @@
 rules_version = '2';
+
 service firebase.storage {
   match /b/{bucket}/o {
+    function isSignedInUser() {
+      return request.auth != null
+             && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    function isReadmeMember() {
+      return isSignedInUser()
+             && request.auth.token.readmeMember == true;
+    }
+
+    function canDeleteEditions() {
+      return isReadmeMember()
+             && request.auth.token.readmeRole in [
+               'leader',
+               'co_leader',
+               'webmaster',
+               'admin'
+             ];
+    }
+
+    function isEditionPdf(year, fileName) {
+      return year.matches('^[0-9]{4}$')
+             && fileName.matches('^' + year + '-0[1-6]\\.pdf$');
+    }
+
+    function isPublicEditionPdf(year, fileName) {
+      return year.matches('^[0-9]{4}$')
+             && fileName.matches('^' + year + '-0[1-6]_public\\.pdf$');
+    }
+
+    function isEditionThumbnail(year, fileName) {
+      return year.matches('^[0-9]{4}$')
+             && fileName.matches('^' + year + '-0[1-6]\\.jpg$');
+    }
+
+    function isValidPdfUpload() {
+      return request.resource != null
+             && request.resource.size > 0
+             && request.resource.contentType == 'application/pdf';
+    }
+
+    function isValidThumbnailUpload() {
+      return request.resource != null
+             && request.resource.size > 0
+             && request.resource.contentType == 'image/jpeg';
+    }
+
+    match /pdf/{year}/{fileName} {
+      // TODO: Restore authenticated reads once abakus.no no longer
+      // depends on direct access to original PDFs in Firebase Storage.
+      // allow read: if isEditionPdf(year, fileName) && isSignedInUser();
+      allow read: if isEditionPdf(year, fileName);
+      allow create, update: if isEditionPdf(year, fileName)
+                            && isReadmeMember()
+                            && isValidPdfUpload();
+      allow delete: if isEditionPdf(year, fileName) && canDeleteEditions();
+    }
+
+    // Redacted/public editions and their thumbnails are intentionally public.
+    match /pdf_public/{year}/{fileName} {
+      allow read: if isPublicEditionPdf(year, fileName);
+      allow create, update: if isPublicEditionPdf(year, fileName)
+                            && isReadmeMember()
+                            && isValidPdfUpload();
+      allow delete: if isPublicEditionPdf(year, fileName)
+                    && canDeleteEditions();
+    }
+
+    match /images/{year}/{fileName} {
+      allow read: if isEditionThumbnail(year, fileName);
+      allow create, update: if isEditionThumbnail(year, fileName)
+                            && isReadmeMember()
+                            && isValidThumbnailUpload();
+      allow delete: if isEditionThumbnail(year, fileName)
+                    && canDeleteEditions();
+    }
+
+    // Any path not explicitly matched above is denied by default.
     match /{allPaths=**} {
-      allow read: if true;
-      allow create: if request.auth != null 
-                   && request.auth.token.firebase.sign_in_provider != "anonymous"
-                   && request.auth.token.readmeMember == true;
-      allow update: if request.auth != null 
-                   && request.auth.token.firebase.sign_in_provider != "anonymous"
-                   && request.auth.token.readmeMember == true;
-      allow delete: if request.auth != null 
-                   && request.auth.token.firebase.sign_in_provider != "anonymous"
-                   && request.auth.token.readmeMember == true
-                   && (request.auth.token.readmeRole == "leader" || request.auth.token.readmeRole == "co_leader" || request.auth.token.readmeRole == "webmaster" || request.auth.token.readmeRole == "admin");
+      allow read, write: if false;
     }
   }
 }

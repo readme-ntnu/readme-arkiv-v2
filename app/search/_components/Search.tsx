@@ -5,7 +5,7 @@ import algoliasearch from "algoliasearch/lite";
 import { SearchBox } from "./SearchBox";
 import { SearchTable } from "./SearchTable";
 import "instantsearch.css/themes/reset.css";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const searchClient = algoliasearch(
   "K9OSMLFRD3",
@@ -13,9 +13,11 @@ const searchClient = algoliasearch(
 );
 
 export default function Search() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
 
   return (
     <InstantSearch searchClient={searchClient} indexName="Articles">

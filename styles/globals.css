@@ -17,6 +17,8 @@
   --danger: oklch(53.19% 0.2057 28.32);
   --background: oklch(97.02% 0.0000 28.32);
   --surface: oklch(100.00% 0.0012 28.32);
+  --surface-secondary: oklch(95.24% 0.0012 28.32);
+  --surface-tertiary: oklch(93.73% 0.0012 28.32);
   --field-background: oklch(100.00% 0.0000 28.32);
   --default: oklch(87.11% 0.0055 286.29);
   --separator: oklch(92.00% 0.0024 28.32);
@@ -32,6 +34,8 @@
   --danger: oklch(53.19% 0.2057 28.32);
   --background: oklch(21.45% 0.0016 17.28);
   --surface: oklch(24.995% 0.00302 16.842);
+  --surface-secondary: oklch(26.663% 0.00297 16.782);
+  --surface-tertiary: oklch(29.225% 0.00437 16.989);
   --field-background: oklch(27.39% 0.0055 286.03);
   --default: oklch(37.03% 0.0119 285.81);
   --separator: oklch(29.522% 0.00289 16.682);

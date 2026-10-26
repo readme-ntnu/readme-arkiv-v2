@@ -3,7 +3,7 @@
 import { Toast } from "@heroui/react";
 import { ThemeProvider } from "next-themes";
 import { useEffect } from "react";
-import { ensureFirebaseAuthServiceWorker } from "../lib/Firebase/client/firebaseAuthServiceWorker";
+import { ensureFirebaseAuthServiceWorker } from "client/authServiceWorker";
 
 // Service worker to bridge authenticated state between the client and the server
 export default function Providers({ children }: { children: React.ReactNode }) {

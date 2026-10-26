@@ -3,10 +3,10 @@
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithCustomToken } from "firebase/auth";
-import { auth } from "lib/Firebase/client/firebase";
+import { auth } from "lib/firebase/client";
 import { Spinner } from "@heroui/react";
-import { ROUTES } from "utils/routes";
-import { syncFirebaseAuthTokenWithServiceWorker } from "../../../lib/Firebase/client/firebaseAuthServiceWorker";
+import { getSafeReturnTo, ROUTES } from "utils/routes";
+import { syncFirebaseAuthTokenWithServiceWorker } from "client/authServiceWorker";
 
 function CompleteLoginContent() {
   const router = useRouter();
@@ -14,6 +14,7 @@ function CompleteLoginContent() {
 
   useEffect(() => {
     const token = searchParams.get("token");
+    const returnTo = getSafeReturnTo(searchParams.get("returnTo"));
 
     if (!token) {
       router.replace(
@@ -27,7 +28,7 @@ function CompleteLoginContent() {
         syncFirebaseAuthTokenWithServiceWorker(credential.user),
       )
       .then(() => {
-        router.replace(ROUTES.ADMIN);
+        router.replace(returnTo);
       })
       .catch((error) => {
         router.replace(

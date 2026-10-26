@@ -2,7 +2,7 @@ import { buttonVariants, cn } from "@heroui/styles";
 import { Magnifier, Bars } from "@gravity-ui/icons";
 import Link from "next/link";
 import { Suspense } from "react";
-import { getAuthenticatedUser } from "../../lib/Firebase/server/auth";
+import { getAuthenticatedUser, isReadmeMember } from "server/auth";
 import { ROUTES } from "../../utils/routes";
 import { LightSwitch } from "./LightSwitch";
 import { NavBarMenu, type NavBarUser } from "./NavBarMenu";
@@ -23,7 +23,10 @@ async function AuthenticatedNavBarMenu() {
 
 export function NavBar() {
   return (
-    <nav className="py-5 px-5 md:px-10 flex justify-between items-center bg-background gap-5">
+    <nav
+      data-app-chrome
+      className="py-5 px-5 md:px-10 flex justify-between items-center bg-background gap-5"
+    >
       <Link href={ROUTES.HOME}>
         <ReadmeLogo maxWidth="190px" />
       </Link>

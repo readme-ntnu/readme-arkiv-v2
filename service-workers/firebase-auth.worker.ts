@@ -7,7 +7,7 @@ import {
   getIdToken,
   onAuthStateChanged,
 } from "firebase/auth";
-import { config } from "../lib/Firebase/config";
+import { config } from "../lib/firebase/firebaseConfig";
 
 const serviceWorker = self as unknown as ServiceWorkerGlobalScope;
 

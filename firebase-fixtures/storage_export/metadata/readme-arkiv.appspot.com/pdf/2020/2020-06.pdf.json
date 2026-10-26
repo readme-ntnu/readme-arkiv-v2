@@ -6,7 +6,7 @@
   "generation": 1629325676639,
   "storageClass": "STANDARD",
   "etag": "someETag",
-  "contentDisposition": "inline",
+  "contentDisposition": "inline; filename=\"2020-06.pdf\"",
   "contentEncoding": "identity",
   "customMetadata": {
     "listinglop": "false"

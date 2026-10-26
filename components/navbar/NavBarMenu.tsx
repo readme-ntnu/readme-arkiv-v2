@@ -9,13 +9,22 @@ import {
   PersonGear,
   Xmark,
 } from "@gravity-ui/icons";
-import { Avatar, Button, cn, Dropdown, toast } from "@heroui/react";
+import {
+  Avatar,
+  Button,
+  buttonVariants,
+  cn,
+  Description,
+  Dropdown,
+  Separator,
+  toast,
+} from "@heroui/react";
 import { signOut } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../lib/Firebase/client/firebase";
+import { useIdToken } from "react-firebase-hooks/auth";
+import { auth } from "lib/firebase/client";
 import { ROUTES } from "../../utils/routes";
 
 export type NavBarUser = {
@@ -29,7 +38,25 @@ export function NavBarMenu({
 }: {
   initialUser: NavBarUser | null;
 }) {
-  const [firebaseUser, authLoading] = useAuthState(auth);
+  const [hasAdminAccess, setHasAdminAccess] = useState(false);
+  const [firebaseUser, authLoading] = useIdToken(auth, {
+    onUserChanged: async (user) => {
+      if (!user) {
+        setHasAdminAccess(false);
+        return;
+      }
+
+      try {
+        const token = await user.getIdTokenResult();
+        setHasAdminAccess(
+          auth.currentUser?.uid === user.uid &&
+            token.claims.readmeMember === true,
+        );
+      } catch {
+        setHasAdminAccess(false);
+      }
+    },
+  });
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -61,7 +88,7 @@ export function NavBarMenu({
       >
         {isOpen ? <Xmark /> : <Bars />}
       </Button>
-      <Dropdown.Popover placement="bottom right">
+      <Dropdown.Popover placement="bottom right" className="w-60">
         {user ? (
           <div className="px-3 pt-3 pb-1">
             <div className="flex items-center gap-2">
@@ -85,7 +112,30 @@ export function NavBarMenu({
             </div>
           </div>
         ) : null}
+        {!user && (
+          <div className="flex flex-col gap-1 px-4 pt-4 pb-2">
+            <Link
+              href={ROUTES.LOGIN}
+              onClick={() => setIsOpen(false)}
+              className={cn(
+                buttonVariants({
+                  variant: "danger",
+                  size: "sm",
+                  fullWidth: true,
+                }),
+                "rounded-full",
+              )}
+            >
+              <Person />
+              Logg inn
+            </Link>
+            <Description className="mx-1">
+              Logg inn med Abakus-bruker for å få full tilgang til alle utgaver!
+            </Description>
+          </div>
+        )}
         <Dropdown.Menu onClick={() => setIsOpen(false)}>
+          <Separator />
           <Dropdown.Item
             textValue="Artikkelsøk"
             id="search"
@@ -122,37 +172,37 @@ export function NavBarMenu({
               </Link>
             )}
           />
-          {user ? (
-            <>
-              <Dropdown.Item
-                textValue="Admin"
-                id="admin"
-                href={ROUTES.ADMIN}
-                render={({ ref, className: herouiClass }) => (
-                  <Link
-                    ref={ref as React.Ref<HTMLAnchorElement>}
-                    href={ROUTES.ADMIN}
-                    className={cn(
-                      herouiClass,
-                      "menu-item flex justify-between px-[10px]",
-                    )}
-                  >
-                    Admin
-                    <PersonGear className="text-muted" />
-                  </Link>
-                )}
-              />
-              <Dropdown.Item
-                textValue="Log ut"
-                id="logout"
-                className="text-danger flex w-full items-center justify-between gap-2"
-                onPress={handleSignOut}
-              >
-                Log ut
-                <ArrowRightFromSquare />
-              </Dropdown.Item>
-            </>
-          ) : null}
+          {user && hasAdminAccess && (
+            <Dropdown.Item
+              textValue="Admin"
+              id="admin"
+              href={ROUTES.ADMIN}
+              render={({ ref, className: herouiClass }) => (
+                <Link
+                  ref={ref as React.Ref<HTMLAnchorElement>}
+                  href={ROUTES.ADMIN}
+                  className={cn(
+                    herouiClass,
+                    "menu-item flex justify-between px-[10px]",
+                  )}
+                >
+                  Admin
+                  <PersonGear className="text-muted" />
+                </Link>
+              )}
+            />
+          )}
+          {user && (
+            <Dropdown.Item
+              textValue="Log ut"
+              id="logout"
+              className="text-danger flex w-full items-center justify-between gap-2"
+              onPress={handleSignOut}
+            >
+              Log ut
+              <ArrowRightFromSquare />
+            </Dropdown.Item>
+          )}
         </Dropdown.Menu>
       </Dropdown.Popover>
     </Dropdown>

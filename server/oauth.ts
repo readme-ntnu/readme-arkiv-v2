@@ -1,10 +1,13 @@
+import "server-only";
+
 import { NextResponse } from "next/server";
-import { API_ROUTES } from "./routes";
+import { API_ROUTES } from "../utils/routes";
 import { createHash, randomBytes } from "crypto";
-import getBaseUrl from "./baseUrl";
+import getBaseUrl from "../utils/baseUrl";
 
 export const LEGO_OAUTH_STATE_COOKIE = "lego_oauth_state";
 export const LEGO_OAUTH_PKCE_COOKIE = "lego_oauth_pkce";
+export const LEGO_OAUTH_RETURN_TO_COOKIE = "lego_oauth_return_to";
 
 export const oauthCookieOptions = {
   httpOnly: true,
@@ -31,6 +34,11 @@ export function clearOAuthCookies(response: NextResponse) {
   });
 
   response.cookies.set(LEGO_OAUTH_PKCE_COOKIE, "", {
+    ...oauthCookieOptions,
+    maxAge: 0,
+  });
+
+  response.cookies.set(LEGO_OAUTH_RETURN_TO_COOKIE, "", {
     ...oauthCookieOptions,
     maxAge: 0,
   });
