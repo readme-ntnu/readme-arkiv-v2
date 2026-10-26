@@ -15,6 +15,7 @@
 # production
 /build
 /public/firebase-auth-service-worker.js
+/public/pdfjs/
 
 # misc
 .DS_Store
